@@ -6,10 +6,16 @@ import { AppComponent } from './app.component';
 import { EditorComponent } from './components/editor/editor.component';
 import { WhiteboardComponent } from './components/editor/whiteboard/whiteboard.component';
 import { ButtonModule } from 'primeng/button';
-
+import { MenubarModule } from 'primeng/menubar';
+import { NavbarComponent } from './components/navbar/navbar.component';
 @NgModule({
-  declarations: [AppComponent, EditorComponent, WhiteboardComponent],
-  imports: [BrowserModule, BrowserAnimationsModule, ButtonModule],
+  declarations: [AppComponent, EditorComponent, WhiteboardComponent, NavbarComponent],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    ButtonModule,
+    MenubarModule,
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })
