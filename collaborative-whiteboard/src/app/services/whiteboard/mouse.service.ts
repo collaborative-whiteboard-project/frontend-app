@@ -49,6 +49,8 @@ export class MouseService {
       this.mouseDown = true;
       this.mouseDownX = mouseEvent.clientX;
       this.mouseDownY = mouseEvent.clientY;
+
+      this.activeController.onSelected();
     }
   }
 

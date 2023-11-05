@@ -8,6 +8,7 @@ import { Shape } from '../../enums/shape.enum';
 import { ToolboxService } from '../../services/toolbox/toolbox.service';
 import { Subscription } from 'rxjs';
 import { Circle } from '../../models/whiteboard/circle.model';
+import { PropertiesService } from 'src/app/services/properties/properties.service';
 
 @Component({
   selector: 'app-whiteboard',
@@ -16,17 +17,35 @@ import { Circle } from '../../models/whiteboard/circle.model';
 })
 export class WhiteboardComponent implements OnInit, OnDestroy {
   createShapeSub: Subscription;
+  updatePropertiesSub: Subscription;
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private mouseController: MouseService,
     private shapeCreationService: ShapeCreationService,
-    private toolboxService: ToolboxService
+    private toolboxService: ToolboxService,
+    private propertiesService: PropertiesService
   ) {
     this.createShapeSub = this.toolboxService.createShapeSub.subscribe(
       (next: Shape) => {
         this.createNewElement(next);
       }
     );
+
+    this.updatePropertiesSub =
+      this.propertiesService.updatePropertiesEventEmmiter.subscribe(
+        (properties) => {
+          const element = document.getElementById(properties.id);
+          if (!!element) {
+            element.setAttributeNS(null, 'fill', properties.fill);
+            element.setAttributeNS(
+              null,
+              'stroke-width',
+              properties['stroke-width']
+            );
+            element.setAttributeNS(null, 'stroke', properties.stroke);
+          }
+        }
+      );
   }
 
   ngOnInit(): void {
@@ -36,13 +55,15 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     const surface = new Surface(
       this.mouseController,
       svgSurface,
-      this.document
+      this.document,
+      this.propertiesService
     );
     surface.resizeGrid('90', '90', '9', '9');
   }
 
   ngOnDestroy(): void {
     this.createShapeSub.unsubscribe();
+    this.updatePropertiesSub.unsubscribe();
   }
 
   createNewElement(shapeType: Shape) {
@@ -60,10 +81,10 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
   createElementModel(shapeType: Shape, element: HTMLElement) {
     switch (shapeType) {
       case Shape.RECTANGLE:
-        new Rectangle(this.mouseController, element);
+        new Rectangle(this.mouseController, element, this.propertiesService);
         break;
       case Shape.CIRCLE:
-        new Circle(this.mouseController, element);
+        new Circle(this.mouseController, element, this.propertiesService);
         break;
       case Shape.DIAMOND:
         break;
