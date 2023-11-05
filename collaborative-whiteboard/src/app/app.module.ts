@@ -8,8 +8,10 @@ import { WhiteboardComponent } from './components/editor/whiteboard/whiteboard.c
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { ToolboxComponent } from './components/editor/toolbox/toolbox.component';
+import { PropertiesComponent } from './components/editor/properties/properties.component';
 @NgModule({
-  declarations: [AppComponent, EditorComponent, WhiteboardComponent, NavbarComponent],
+  declarations: [AppComponent, EditorComponent, WhiteboardComponent, NavbarComponent, ToolboxComponent, PropertiesComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
