@@ -14,7 +14,7 @@ export abstract class SvgObject {
 
   constructor(
     protected mouseController: MouseService,
-    svgElement: HTMLElement
+    protected svgElement: HTMLElement
   ) {
     this.mouseController.attach(svgElement, this);
   }
@@ -62,4 +62,5 @@ export abstract class SvgObject {
 
   abstract onDrag(event: Event): void;
   abstract onMouseLeave(event: Event): void;
+  abstract onSelected(): void;
 }

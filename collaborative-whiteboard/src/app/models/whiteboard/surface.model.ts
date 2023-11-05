@@ -1,3 +1,4 @@
+import { PropertiesService } from 'src/app/services/properties/properties.service';
 import { MouseService } from '../../services/whiteboard/mouse.service';
 import { SvgElement } from './svg-element.model';
 
@@ -8,9 +9,10 @@ export class Surface extends SvgElement {
   constructor(
     mouseController: MouseService,
     svgSurface: HTMLElement,
-    private document: Document
+    private document: Document,
+    propertiesService: PropertiesService
   ) {
-    super(mouseController, svgSurface);
+    super(mouseController, svgSurface, propertiesService);
   }
 
   override onDrag(event: Event): void {
@@ -80,5 +82,9 @@ export class Surface extends SvgElement {
         (+svgH + +cellHeight * 2).toString()
       );
     }
+  }
+
+  override onSelected(): void {
+    this.propertiesService.clearSelectedEventEmmiter.next();
   }
 }

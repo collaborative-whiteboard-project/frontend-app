@@ -1,10 +1,12 @@
+import { PropertiesService } from 'src/app/services/properties/properties.service';
 import { MouseService } from '../../services/whiteboard/mouse.service';
 import { SvgObject } from './svg-object.model';
 
 export class SvgElement extends SvgObject {
   constructor(
     mouseController: MouseService,
-    protected svgElement: HTMLElement
+    svgElement: HTMLElement,
+    protected propertiesService: PropertiesService
   ) {
     super(mouseController, svgElement);
     this.registerEventListener(
@@ -51,5 +53,21 @@ export class SvgElement extends SvgObject {
   }
   override onMouseLeave(event: Event): void {
     this.onDrag(event);
+  }
+
+  onSelected() {
+    const id = this.svgElement.getAttribute('id');
+    const stroke = this.svgElement.getAttribute('stroke');
+    const strokeWidth = this.svgElement.getAttribute('stroke-width');
+    const fill = this.svgElement.getAttribute('fill');
+
+    if (!!id && !!stroke && !!strokeWidth && fill) {
+      this.propertiesService.sendPropertiesEventEmmiter.next({
+        id,
+        stroke,
+        'stroke-width': strokeWidth,
+        fill,
+      });
+    }
   }
 }
