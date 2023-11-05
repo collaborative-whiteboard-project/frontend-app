@@ -30,15 +30,16 @@ export class MouseService {
   }
 
   onMouseDown(event: Event) {
-    if ((<MouseEvent>event).button === LEFT_MOUSE_BUTTON) {
+    const mouseEvent = <MouseEvent>event;
+    if (mouseEvent.button === LEFT_MOUSE_BUTTON) {
       event.preventDefault();
-      const target = event.currentTarget;
+      const target = <HTMLElement>event.currentTarget;
 
       if (!target) {
         return;
       }
 
-      const id = (<HTMLElement>target).getAttribute('id');
+      const id = target.getAttribute('id');
 
       if (!id) {
         return;
@@ -46,8 +47,8 @@ export class MouseService {
 
       this.activeController = this.controllers[id];
       this.mouseDown = true;
-      this.mouseDownX = (<MouseEvent>event).clientX;
-      this.mouseDownY = (<MouseEvent>event).clientY;
+      this.mouseDownX = mouseEvent.clientX;
+      this.mouseDownY = mouseEvent.clientY;
     }
   }
 
