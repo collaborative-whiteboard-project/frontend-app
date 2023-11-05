@@ -3,15 +3,22 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppComponent } from './app.component';
-import { EditorComponent } from './components/editor/editor.component';
-import { WhiteboardComponent } from './components/editor/whiteboard/whiteboard.component';
+import { EditorComponent } from './pages/editor/editor.component';
+import { WhiteboardComponent } from './components/whiteboard/whiteboard.component';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { ToolboxComponent } from './components/editor/toolbox/toolbox.component';
-import { PropertiesComponent } from './components/editor/properties/properties.component';
+import { ToolboxComponent } from './components/toolbox/toolbox.component';
+import { PropertiesComponent } from './components/properties/properties.component';
 @NgModule({
-  declarations: [AppComponent, EditorComponent, WhiteboardComponent, NavbarComponent, ToolboxComponent, PropertiesComponent],
+  declarations: [
+    AppComponent,
+    EditorComponent,
+    WhiteboardComponent,
+    NavbarComponent,
+    ToolboxComponent,
+    PropertiesComponent,
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { ToolboxService } from '../services/toolbox.service';
-import { Shape } from '../whiteboard/enums/shape.enum';
+import { ToolboxService } from '../../services/toolbox/toolbox.service';
+import { Shape } from '../../enums/shape.enum';
 
 @Component({
   selector: 'app-toolbox',

@@ -1,4 +1,4 @@
-import { MouseService } from '../services/mouse.service';
+import { MouseService } from '../../services/whiteboard/mouse.service';
 interface SvgEvent {
   element: HTMLElement;
   eventName: string;

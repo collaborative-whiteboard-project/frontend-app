@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { Shape } from '../whiteboard/enums/shape.enum';
+import { Shape } from '../../enums/shape.enum';
 
 @Injectable({
   providedIn: 'root',

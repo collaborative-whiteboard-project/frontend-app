@@ -1,13 +1,13 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
-import { MouseService } from './services/mouse.service';
-import { Rectangle } from './models/rectangle.model';
-import { Surface } from './models/surface.mode';
-import { ShapeCreationService } from './services/shape-creation.service';
-import { Shape } from './enums/shape.enum';
-import { ToolboxService } from '../services/toolbox.service';
+import { MouseService } from '../../services/whiteboard/mouse.service';
+import { Rectangle } from '../../models/whiteboard/rectangle.model';
+import { Surface } from '../../models/whiteboard/surface.mode';
+import { ShapeCreationService } from '../../services/whiteboard/shape-creation.service';
+import { Shape } from '../../enums/shape.enum';
+import { ToolboxService } from '../../services/toolbox/toolbox.service';
 import { Subscription } from 'rxjs';
-import { Circle } from './models/circle.model';
+import { Circle } from '../../models/whiteboard/circle.model';
 
 @Component({
   selector: 'app-whiteboard',

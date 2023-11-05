@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SvgObject } from '../models/svg-object.model';
+import { SvgObject } from '../../models/whiteboard/svg-object.model';
 
 const LEFT_MOUSE_BUTTON = 0;
 

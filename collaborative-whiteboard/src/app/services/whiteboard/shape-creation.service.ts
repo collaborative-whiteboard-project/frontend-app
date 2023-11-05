@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Shape } from '../enums/shape.enum';
+import { Shape } from '../../enums/shape.enum';
 import { v4 as uuidv4 } from 'uuid';
 
 const defaultRectAttributes = {

@@ -1,4 +1,4 @@
-import { MouseService } from '../services/mouse.service';
+import { MouseService } from '../../services/whiteboard/mouse.service';
 import { SvgObject } from './svg-object.model';
 
 export class SvgElement extends SvgObject {
