@@ -1,1 +1,43 @@
-<div class="properties"></div>
+<div *ngIf="elementSelected" class="properties">
+  <h3>Properties</h3>
+  <div class="content">
+    <div class="p-inputgroup">
+      <span class="p-inputgroup-addon"> Stroke width </span>
+      <select
+        #strokeSelect
+        name="stroke-width"
+        id="stroke-select"
+        [value]="strokeWidth"
+        (change)="onStrokeChange(strokeSelect.value)"
+      >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select>
+    </div>
+    <div class="p-inputgroup">
+      <span class="p-inputgroup-addon">Stroke</span>
+      <input
+        #strokeColor
+        type="color"
+        class="color-input"
+        [value]="strokeColor"
+        (change)="onStrokeColorChange(strokeColor.value)"
+      />
+    </div>
+    <div class="p-inputgroup">
+      <span class="p-inputgroup-addon">Fill</span>
+      <input
+        #fillColor
+        type="color"
+        class="color-input"
+        [value]="fillColor"
+        (change)="onFillColorChange(fillColor.value)"
+      />
+    </div>
+  </div>
+  <p-button (onClick)="onApply()">Apply</p-button>
+</div>
