@@ -2,7 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { MouseService } from '../../services/whiteboard/mouse.service';
 import { Rectangle } from '../../models/whiteboard/rectangle.model';
-import { Surface } from '../../models/whiteboard/surface.mode';
+import { Surface } from '../../models/whiteboard/surface.model';
 import { ShapeCreationService } from '../../services/whiteboard/shape-creation.service';
 import { Shape } from '../../enums/shape.enum';
 import { ToolboxService } from '../../services/toolbox/toolbox.service';
