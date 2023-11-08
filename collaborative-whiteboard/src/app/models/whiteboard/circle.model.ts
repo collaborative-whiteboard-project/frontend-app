@@ -1,13 +1,8 @@
 import { PropertiesService } from 'src/app/services/properties/properties.service';
-import { MouseService } from '../../services/whiteboard/mouse.service';
-import { SvgElement } from './svg-element.model';
+import { SvgObject } from './svg-object.model';
 
-export class Circle extends SvgElement {
-  constructor(
-    mouseController: MouseService,
-    svgElement: HTMLElement,
-    propertiesService: PropertiesService
-  ) {
-    super(mouseController, svgElement, propertiesService);
+export class Circle extends SvgObject {
+  constructor(svgElement: HTMLElement, propertiesService: PropertiesService) {
+    super(svgElement, propertiesService);
   }
 }

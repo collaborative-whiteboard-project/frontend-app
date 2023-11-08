@@ -1,32 +1,35 @@
+import { Subject } from 'rxjs';
+import { SvgObject } from './svg-object.model';
 import { PropertiesService } from 'src/app/services/properties/properties.service';
-import { MouseService } from '../../services/whiteboard/mouse.service';
-import { SvgElement } from './svg-element.model';
 
-export class Surface extends SvgElement {
-  gridCellW: string = '80';
-  gridCellH: string = '80';
+export class Surface {
+  surfaceHeight = 0;
+  surfaceWidth = 0;
+  gridCellWidth = '0';
+  gridCellHeight = '0';
 
   constructor(
-    mouseController: MouseService,
-    svgSurface: HTMLElement,
-    private document: Document,
-    propertiesService: PropertiesService
+    private surface: HTMLElement,
+    private propertiesService: PropertiesService,
+    private document: Document
   ) {
-    super(mouseController, svgSurface, propertiesService);
+    this.surfaceHeight = +surface.getAttribute('height')!;
+    this.surfaceWidth = +surface.getAttribute('width')!;
+    this.surface.addEventListener('mousedown', this.onSelected.bind(this));
   }
 
-  override onDrag(event: Event): void {
-    return;
+  onSelected() {
+    this.propertiesService.clearSelectedEventEmmiter.next();
   }
 
   resizeGrid(
-    cellWidth: string,
-    cellHeight: string,
-    smallCellWidth: string,
-    smallCellHeight: string
+    largeGridWidth: string,
+    largeGridHeight: string,
+    smallGridWidth: string,
+    smallGridHeight: string
   ) {
-    this.gridCellW = cellWidth;
-    this.gridCellH = cellHeight;
+    this.gridCellWidth = largeGridWidth;
+    this.gridCellHeight = largeGridHeight;
     const largeGridRect = this.document.getElementById('largeGridRect');
     const largeGridPath = this.document.getElementById('largeGridPath');
     const largeGrid = this.document.getElementById('largeGrid');
@@ -37,54 +40,36 @@ export class Surface extends SvgElement {
     const svg = this.document.getElementById('svg');
     const grid = this.document.getElementById('grid');
 
-    largeGridRect?.setAttribute('width', cellWidth);
-    largeGridRect?.setAttribute('height', cellHeight);
+    largeGridRect?.setAttribute('width', largeGridWidth);
+    largeGridRect?.setAttribute('height', largeGridHeight);
 
     largeGridPath?.setAttribute(
       'd',
-      'M ' + cellWidth + ' 0 H 0 V ' + cellHeight
+      `M ${largeGridWidth} 0 H 0 V ${largeGridHeight}`
     );
-    largeGrid?.setAttribute('width', cellWidth);
-    largeGrid?.setAttribute('height', cellHeight);
+    largeGrid?.setAttribute('width', largeGridWidth);
+    largeGrid?.setAttribute('height', largeGridHeight);
 
     smallGridPath?.setAttribute(
       'd',
-      'M ' + smallCellWidth + ' 0 H 0 V ' + smallCellHeight
+      `M ${smallGridWidth} 0 H 0 V ${smallGridHeight}`
     );
-    smallGrid?.setAttribute('width', smallCellWidth);
-    smallGrid?.setAttribute('height', smallCellHeight);
+    smallGrid?.setAttribute('width', smallGridWidth);
+    smallGrid?.setAttribute('height', smallGridHeight);
 
-    grid?.setAttribute('x', (-cellWidth).toString());
-    grid?.setAttribute('y', (-cellHeight).toString());
+    grid?.setAttribute('x', '0');
+    grid?.setAttribute('y', '0');
 
-    var svgW = svg?.getAttribute('width');
-    var svgH = svg?.getAttribute('height');
+    const svgWidth = svg?.getAttribute('width')!;
+    const svgHeight = svg?.getAttribute('height')!;
 
-    if (!!svgW && !!svgH) {
-      this.svgElement?.setAttribute(
-        'width',
-        (+svgW + +cellWidth * 2).toString()
-      );
-      this.svgElement?.setAttribute(
-        'height',
-        (+svgH + +cellHeight * 2).toString()
-      );
+    this.surface.setAttribute('width', svgWidth);
+    this.surface.setAttribute('height', svgHeight);
 
-      this.svgElement?.setAttribute('x', (-cellWidth).toString());
-      this.svgElement?.setAttribute('y', (-cellHeight).toString());
+    grid?.setAttribute('x', '0');
+    grid?.setAttribute('y', '0');
 
-      this.svgElement?.setAttribute(
-        'width',
-        (+svgW + +cellWidth * 2).toString()
-      );
-      this.svgElement?.setAttribute(
-        'height',
-        (+svgH + +cellHeight * 2).toString()
-      );
-    }
-  }
-
-  override onSelected(): void {
-    this.propertiesService.clearSelectedEventEmmiter.next();
+    grid?.setAttribute('width', svgWidth);
+    grid?.setAttribute('height', svgHeight);
   }
 }
