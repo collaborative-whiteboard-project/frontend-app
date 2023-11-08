@@ -1,14 +1,16 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
-import { MouseService } from '../../services/whiteboard/mouse.service';
-import { Rectangle } from '../../models/whiteboard/rectangle.model';
-import { Surface } from '../../models/whiteboard/surface.model';
 import { ShapeCreationService } from '../../services/whiteboard/shape-creation.service';
 import { Shape } from '../../enums/shape.enum';
 import { ToolboxService } from '../../services/toolbox/toolbox.service';
 import { Subscription } from 'rxjs';
-import { Circle } from '../../models/whiteboard/circle.model';
 import { PropertiesService } from 'src/app/services/properties/properties.service';
+import { SvgObject } from 'src/app/models/whiteboard/svg-object.model';
+import { Surface } from 'src/app/models/whiteboard/surface.model';
+import { Rectangle } from 'src/app/models/whiteboard/rectangle.model';
+import { Circle } from 'src/app/models/whiteboard/circle.model';
+import { Path } from 'src/app/models/whiteboard/path.model';
+import { DrawingSurface } from 'src/app/models/whiteboard/drawing-surface.model';
 
 @Component({
   selector: 'app-whiteboard',
@@ -16,77 +18,106 @@ import { PropertiesService } from 'src/app/services/properties/properties.servic
   styleUrls: ['./whiteboard.component.scss'],
 })
 export class WhiteboardComponent implements OnInit, OnDestroy {
+  svgWidth = '1201';
+  svgHeight = '801';
   createShapeSub: Subscription;
-  updatePropertiesSub: Subscription;
+  activateDrawingModeSub = new Subscription();
+  // updatePropertiesSub: Subscription;
+  createPathSub = new Subscription();
+  drawingSurfaceModel: DrawingSurface | null = null;
+  objects: { [key: string]: SvgObject } = {};
+  svgObjects: HTMLElement | null = null;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
-    private mouseController: MouseService,
     private shapeCreationService: ShapeCreationService,
     private toolboxService: ToolboxService,
     private propertiesService: PropertiesService
   ) {
-    this.createShapeSub = this.toolboxService.createShapeSub.subscribe(
-      (next: Shape) => {
-        this.createNewElement(next);
+    this.createShapeSub = this.toolboxService.createShapeEventEmmiter.subscribe(
+      (shapeType: Shape) => {
+        this.createNewFigure(shapeType);
       }
     );
-
-    this.updatePropertiesSub =
-      this.propertiesService.updatePropertiesEventEmmiter.subscribe(
-        (properties) => {
-          const element = document.getElementById(properties.id);
-          if (!!element) {
-            element.setAttributeNS(null, 'fill', properties.fill);
-            element.setAttributeNS(
-              null,
-              'stroke-width',
-              properties['stroke-width']
-            );
-            element.setAttributeNS(null, 'stroke', properties.stroke);
-          }
-        }
-      );
   }
 
   ngOnInit(): void {
     // Prepare whiteboard grid
+    const svg = <HTMLElement>this.document.getElementById('svg');
+    svg.setAttribute('width', this.svgWidth);
+    svg.setAttribute('height', this.svgHeight);
     const svgSurface = <HTMLElement>this.document.getElementById('surface');
-
-    const surface = new Surface(
-      this.mouseController,
-      svgSurface,
-      this.document,
-      this.propertiesService
+    this.svgObjects = <HTMLElement>this.document.getElementById('objects');
+    const svgTempObjects = <HTMLElement>(
+      this.document.getElementById('temp-objects')
     );
-    surface.resizeGrid('90', '90', '9', '9');
+    const svgTempPath = <HTMLElement>this.document.getElementById('temp-path');
+    const surfaceModel = new Surface(
+      svgSurface,
+      this.propertiesService,
+      this.document
+    );
+    const svgDrawingSurface = this.shapeCreationService.createDrawingSurface(
+      this.svgWidth,
+      this.svgHeight,
+      this.document
+    );
+    this.drawingSurfaceModel = new DrawingSurface(
+      svgDrawingSurface,
+      svgTempPath,
+      svgTempObjects
+    );
+    surfaceModel.resizeGrid('100', '100', '10', '10');
+
+    this.document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        this.drawingSurfaceModel?.deactivateDrawinSurface();
+      }
+    });
+
+    this.createPathSub =
+      this.drawingSurfaceModel.createPathEventEmmiter.subscribe((d: string) => {
+        this.createNewFigure(Shape.PATH, d);
+      });
+
+    this.activateDrawingModeSub =
+      this.toolboxService.activateDrawingModeEventEmmiter.subscribe(() => {
+        this.drawingSurfaceModel?.activateDrawingSurface();
+      });
   }
 
   ngOnDestroy(): void {
-    this.createShapeSub.unsubscribe();
-    this.updatePropertiesSub.unsubscribe();
+    // this.createShapeSub.unsubscribe();
+    // this.updatePropertiesSub.unsubscribe();
+    this.createPathSub.unsubscribe();
   }
 
-  createNewElement(shapeType: Shape) {
-    const newShape = this.shapeCreationService.createShape(
+  createNewFigure(shapeType: Shape, d?: string) {
+    let newShape = this.shapeCreationService.createShape(
       shapeType,
-      this.document
+      this.document,
+      d
     );
-    const objects = this.document.getElementById('objects');
-    if (!!newShape && !!objects) {
-      objects.appendChild(newShape);
-      this.createElementModel(shapeType, newShape);
+    if (!!newShape && !!this.svgObjects) {
+      this.svgObjects.appendChild(newShape);
+      this.createShapeModel(shapeType, newShape);
     }
   }
 
-  createElementModel(shapeType: Shape, element: HTMLElement) {
+  createShapeModel(shapeType: Shape, element: HTMLElement) {
+    const id = element.getAttribute('id');
+    if (!id) {
+      return;
+    }
     switch (shapeType) {
       case Shape.RECTANGLE:
-        new Rectangle(this.mouseController, element, this.propertiesService);
+        this.objects[id] = new Rectangle(element, this.propertiesService);
         break;
       case Shape.CIRCLE:
-        new Circle(this.mouseController, element, this.propertiesService);
+        this.objects[id] = new Circle(element, this.propertiesService);
         break;
-      case Shape.DIAMOND:
+      case Shape.PATH:
+        this.objects[id] = new Path(element, this.propertiesService);
         break;
 
       default:

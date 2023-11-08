@@ -1,54 +1,71 @@
-<svg id="svg" width="1171" height="811" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <pattern id="smallGrid" width="8" height="8" patternUnits="userSpaceOnUse">
-      <path
-        id="smallGridPath"
-        d="M 8 0 H 0 V 8"
-        fill="none"
-        stroke="gray"
-        stroke-width="0.5"
-      />
-    </pattern>
-    <pattern
-      id="largeGrid"
-      width="80"
-      height="80"
-      patternUnits="userSpaceOnUse"
+<div class="wrapper">
+  <svg id="svg" width="1201" height="801" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern
+        id="smallGrid"
+        width="8"
+        height="8"
+        patternUnits="userSpaceOnUse"
+      >
+        <path
+          id="smallGridPath"
+          d="M 8 0 H 0 V 8"
+          fill="none"
+          stroke="gray"
+          stroke-width="0.5"
+        />
+      </pattern>
+      <pattern
+        id="largeGrid"
+        width="80"
+        height="80"
+        patternUnits="userSpaceOnUse"
+      >
+        <rect
+          id="largeGridRect"
+          width="80"
+          height="80"
+          fill="url(#smallGrid)"
+        />
+        <path
+          id="largeGridPath"
+          d="M 80 0 H 0 V 80"
+          fill="none"
+          stroke="gray"
+          stroke-width="2"
+        />
+      </pattern>
+    </defs>
+    <g
+      id="surface"
+      transform="translate(0, 0)"
+      x="0"
+      y="0"
+      width="1171"
+      height="811"
     >
-      <rect id="largeGridRect" width="80" height="80" fill="url(#smallGrid)" />
-      <path
-        id="largeGridPath"
-        d="M 80 0 H 0 V 80"
-        fill="none"
-        stroke="gray"
-        stroke-width="2"
+      <rect
+        transform="translate(0, 0)"
+        id="grid"
+        x="0"
+        y="0"
+        width="1171"
+        height="811"
+        fill="url(#largeGrid)"
       />
-    </pattern>
-  </defs>
-  <rect
-    transform="translate(0, 0)"
-    id="surface"
-    x="-80"
-    y="-80"
-    width="1400"
-    height="1000"
-    fill="url(#largeGrid)"
-  />
-  <g id="objects">
-    <!-- <text x="100" y="100" fill="blue" font-weight="bold">My cat</text> -->
-  </g>
+    </g>
+    <g id="objects">
+      <!-- <text x="100" y="100" fill="blue" font-weight="bold">My cat</text> -->
+    </g>
 
-  <!-- <g>
-    <rect
-      id="rectangle"
-      x="100"
-      y="100"
-      width="200"
-      height="100"
-      stroke="black"
-      stroke-width="0.5"
-      fill="white"
-      translate="transform(0,0)"
-    />
-  </g> -->
-</svg>
+    <g id="temp-objects">
+      <path
+        id="temp-path"
+        stroke="black"
+        stroke-width="1"
+        fill="transparent"
+        d=""
+      ></path>
+    </g>
+  </svg>
+</div>

@@ -11,6 +11,10 @@ export class ToolboxComponent {
   public ShapeType = Shape;
   constructor(private toolboxService: ToolboxService) {}
   onGridItemClick(shape: Shape) {
-    this.toolboxService.createShapeSub.next(shape);
+    if (shape === Shape.PATH) {
+      this.toolboxService.activateDrawingModeEventEmmiter.next();
+    } else {
+      this.toolboxService.createShapeEventEmmiter.next(shape);
+    }
   }
 }
