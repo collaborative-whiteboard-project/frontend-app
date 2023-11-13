@@ -1,16 +1,22 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
-import { ShapeCreationService } from '../../services/whiteboard/shape-creation.service';
+import { Subject, Subscription } from 'rxjs';
+
 import { Shape } from '../../enums/shape.enum';
-import { ToolboxService } from '../../services/toolbox/toolbox.service';
-import { Subscription } from 'rxjs';
-import { PropertiesService } from 'src/app/services/properties/properties.service';
-import { SvgObject } from 'src/app/models/whiteboard/svg-object.model';
+import { Path } from 'src/app/models/whiteboard/path.model';
+import { Text } from 'src/app/models/whiteboard/text.model';
+import { Circle } from 'src/app/models/whiteboard/circle.model';
 import { Surface } from 'src/app/models/whiteboard/surface.model';
 import { Rectangle } from 'src/app/models/whiteboard/rectangle.model';
-import { Circle } from 'src/app/models/whiteboard/circle.model';
-import { Path } from 'src/app/models/whiteboard/path.model';
+import { SvgObject } from 'src/app/models/whiteboard/svg-object.model';
 import { DrawingSurface } from 'src/app/models/whiteboard/drawing-surface.model';
+import { ToolboxService } from '../../services/toolbox/toolbox.service';
+import { PropertiesService } from 'src/app/services/properties/properties.service';
+import { ShapeCreationService } from '../../services/whiteboard/shape-creation.service';
+import {
+  AnchorCoordinates,
+  CreateShapeAnchorsData,
+} from 'src/app/shared/create-shape-anchors-data.interface';
 
 @Component({
   selector: 'app-whiteboard',
@@ -20,13 +26,19 @@ import { DrawingSurface } from 'src/app/models/whiteboard/drawing-surface.model'
 export class WhiteboardComponent implements OnInit, OnDestroy {
   svgWidth = '1201';
   svgHeight = '801';
-  createShapeSub: Subscription;
-  activateDrawingModeSub = new Subscription();
-  // updatePropertiesSub: Subscription;
-  createPathSub = new Subscription();
-  drawingSurfaceModel: DrawingSurface | null = null;
+  svgObjectsGroup: HTMLElement | null = null;
+  svgAnchorsGroup: HTMLElement | null = null;
   objects: { [key: string]: SvgObject } = {};
-  svgObjects: HTMLElement | null = null;
+  drawingSurfaceModel: DrawingSurface | null = null;
+  selectedElementId: string | null = null;
+
+  createShapeAnchorsEventEmmiter = new Subject<CreateShapeAnchorsData>();
+
+  createShapeSub = new Subscription();
+  activateDrawingModeSub = new Subscription();
+  updatePropertiesSub = new Subscription();
+  createPathSub = new Subscription();
+  createShapeAnchorsSub = new Subscription();
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -34,7 +46,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     private toolboxService: ToolboxService,
     private propertiesService: PropertiesService
   ) {
-    this.createShapeSub = this.toolboxService.createShapeEventEmmiter.subscribe(
+    this.createShapeSub = this.toolboxService.createShapeEventEmitter.subscribe(
       (shapeType: Shape) => {
         this.createNewFigure(shapeType);
       }
@@ -46,17 +58,22 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     const svg = <HTMLElement>this.document.getElementById('svg');
     svg.setAttribute('width', this.svgWidth);
     svg.setAttribute('height', this.svgHeight);
+
     const svgSurface = <HTMLElement>this.document.getElementById('surface');
-    this.svgObjects = <HTMLElement>this.document.getElementById('objects');
     const svgTempObjects = <HTMLElement>(
       this.document.getElementById('temp-objects')
     );
+    this.svgObjectsGroup = <HTMLElement>this.document.getElementById('objects');
+    this.svgAnchorsGroup = <HTMLElement>this.document.getElementById('anchors');
     const svgTempPath = <HTMLElement>this.document.getElementById('temp-path');
+
     const surfaceModel = new Surface(
       svgSurface,
       this.propertiesService,
       this.document
     );
+    surfaceModel.resizeGrid('100', '100', '10', '10');
+
     const svgDrawingSurface = this.shapeCreationService.createDrawingSurface(
       this.svgWidth,
       this.svgHeight,
@@ -67,11 +84,26 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       svgTempPath,
       svgTempObjects
     );
-    surfaceModel.resizeGrid('100', '100', '10', '10');
-
     this.document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
-        this.drawingSurfaceModel?.deactivateDrawinSurface();
+        //this.drawingSurfaceModel?.deactivateDrawinSurface();
+        const anchors = this.objects[this.selectedElementId!].getAnchors();
+        anchors.forEach((anchor) => {
+          this.svgAnchorsGroup?.removeChild(anchor);
+        });
+        this.selectedElementId = null;
+      } else if (event.key === 'Delete') {
+        if (!!this.selectedElementId) {
+          const anchors = this.objects[this.selectedElementId].getAnchors();
+          anchors.forEach((anchor) => {
+            this.svgAnchorsGroup?.removeChild(anchor);
+          });
+          const elementToDelete = <HTMLElement>(
+            this.document.getElementById(this.selectedElementId)
+          );
+          this.svgObjectsGroup?.removeChild(elementToDelete);
+          this.selectedElementId = null;
+        }
       }
     });
 
@@ -81,15 +113,50 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       });
 
     this.activateDrawingModeSub =
-      this.toolboxService.activateDrawingModeEventEmmiter.subscribe(() => {
+      this.toolboxService.activateDrawingModeEventEmitter.subscribe(() => {
         this.drawingSurfaceModel?.activateDrawingSurface();
       });
+
+    this.updatePropertiesSub =
+      this.propertiesService.updatePropertiesEventEmmiter.subscribe(
+        (properties) => {
+          const element = this.objects[properties.id];
+          element.updateProperties(properties);
+        }
+      );
+
+    this.createShapeAnchorsSub = this.createShapeAnchorsEventEmmiter.subscribe(
+      (data) => {
+        if (data.shapeId === this.selectedElementId) {
+          return;
+        }
+
+        if (!!this.selectedElementId) {
+          const oldSlectedElementAnchors =
+            this.objects[this.selectedElementId!].getAnchors();
+          oldSlectedElementAnchors.forEach((anchor) => {
+            this.svgAnchorsGroup?.removeChild(anchor);
+          });
+          this.selectedElementId = null;
+        }
+
+        this.selectedElementId = data.shapeId;
+        const anchors = this.shapeCreationService.createElementAnchors(
+          data.anchorsCoordinates,
+          this.document
+        );
+        anchors.forEach((anchor) => this.svgAnchorsGroup?.appendChild(anchor));
+        this.objects[data.shapeId].setAnchors(anchors);
+        // TO DO: Send anchors to selectes shape model and add ther event listeners
+      }
+    );
   }
 
   ngOnDestroy(): void {
-    // this.createShapeSub.unsubscribe();
-    // this.updatePropertiesSub.unsubscribe();
+    this.createShapeSub.unsubscribe();
+    this.updatePropertiesSub.unsubscribe();
     this.createPathSub.unsubscribe();
+    this.activateDrawingModeSub.unsubscribe();
   }
 
   createNewFigure(shapeType: Shape, d?: string) {
@@ -98,8 +165,8 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       this.document,
       d
     );
-    if (!!newShape && !!this.svgObjects) {
-      this.svgObjects.appendChild(newShape);
+    if (!!newShape && !!this.svgObjectsGroup) {
+      this.svgObjectsGroup.appendChild(newShape);
       this.createShapeModel(shapeType, newShape);
     }
   }
@@ -111,17 +178,42 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     }
     switch (shapeType) {
       case Shape.RECTANGLE:
-        this.objects[id] = new Rectangle(element, this.propertiesService);
+        this.objects[id] = new Rectangle(
+          element,
+          this.propertiesService,
+          this.createShapeAnchorsEventEmmiter
+        );
         break;
       case Shape.CIRCLE:
-        this.objects[id] = new Circle(element, this.propertiesService);
+        this.objects[id] = new Circle(
+          element,
+          this.propertiesService,
+          this.createShapeAnchorsEventEmmiter
+        );
         break;
       case Shape.PATH:
-        this.objects[id] = new Path(element, this.propertiesService);
+        this.objects[id] = new Path(
+          element,
+          this.propertiesService,
+          this.createShapeAnchorsEventEmmiter
+        );
         break;
-
+      case Shape.TEXT:
+        this.objects[id] = new Text(
+          element,
+          this.propertiesService,
+          this.createShapeAnchorsEventEmmiter
+        );
+        break;
       default:
         break;
     }
+  }
+
+  createShapeAnchors(anchorsCoordinates: AnchorCoordinates[]) {
+    return this.shapeCreationService.createElementAnchors(
+      anchorsCoordinates,
+      this.document
+    );
   }
 }

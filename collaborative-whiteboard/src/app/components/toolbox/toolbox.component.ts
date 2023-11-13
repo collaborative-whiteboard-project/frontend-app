@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { ToolboxService } from '../../services/toolbox/toolbox.service';
+
 import { Shape } from '../../enums/shape.enum';
+import { ToolboxService } from '../../services/toolbox/toolbox.service';
 
 @Component({
   selector: 'app-toolbox',
@@ -12,9 +13,9 @@ export class ToolboxComponent {
   constructor(private toolboxService: ToolboxService) {}
   onGridItemClick(shape: Shape) {
     if (shape === Shape.PATH) {
-      this.toolboxService.activateDrawingModeEventEmmiter.next();
+      this.toolboxService.activateDrawingModeEventEmitter.next();
     } else {
-      this.toolboxService.createShapeEventEmmiter.next(shape);
+      this.toolboxService.createShapeEventEmitter.next(shape);
     }
   }
 }

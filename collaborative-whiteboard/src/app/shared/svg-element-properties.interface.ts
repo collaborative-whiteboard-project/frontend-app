@@ -3,4 +3,5 @@ export interface SvgElementProperties {
   stroke: string;
   'stroke-width': string;
   fill: string;
+  'fill-opacity': string;
 }

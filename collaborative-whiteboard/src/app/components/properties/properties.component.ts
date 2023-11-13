@@ -1,5 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
+
 import { PropertiesService } from 'src/app/services/properties/properties.service';
 
 @Component({
@@ -7,23 +8,28 @@ import { PropertiesService } from 'src/app/services/properties/properties.servic
   templateUrl: './properties.component.html',
   styleUrls: ['./properties.component.scss'],
 })
-export class PropertiesComponent implements OnDestroy {
+export class PropertiesComponent implements OnInit, OnDestroy {
   elementSelected = false;
   elementPropertiesSub: Subscription;
   strokeWidth = '4';
   elementId = '';
-  strokeColor = '#000000';
-  fillColor = '#FFFFFF';
+  strokeColorValue = '#000000';
+  fillColorValue = '#FFFFFF';
+  fillOpacityValue = '1';
   clearSelectedSub: Subscription;
+
+  // @ViewChild('strokeColor') strokeColorPicker!: ElementRef;
+  // @ViewChild('fillColor') fillColorPicker!: ElementRef;
   constructor(private propertiesService: PropertiesService) {
     this.elementPropertiesSub =
       this.propertiesService.sendPropertiesEventEmmiter.subscribe(
         (properties) => {
           this.strokeWidth = properties['stroke-width'];
-          this.strokeColor = properties.stroke;
-          this.fillColor = properties.fill;
+          this.strokeColorValue = properties.stroke;
+          this.fillColorValue = properties.fill;
           this.elementId = properties.id;
           this.elementSelected = true;
+          this.fillOpacityValue = properties['fill-opacity'];
         }
       );
 
@@ -32,6 +38,10 @@ export class PropertiesComponent implements OnDestroy {
         this.elementSelected = false;
       });
   }
+  ngOnInit(): void {
+    // this.fillColorPicker.nativeElement.value = this.fillColorV;
+    // this.strokeColorPicker.nativeElement.value = this.strokeColorPicker;
+  }
   ngOnDestroy(): void {
     this.clearSelectedSub.unsubscribe();
     this.elementPropertiesSub.unsubscribe();
@@ -39,22 +49,31 @@ export class PropertiesComponent implements OnDestroy {
 
   onStrokeChange(value: string) {
     this.strokeWidth = value;
+    this.sendProperties();
   }
 
   onStrokeColorChange(value: string) {
-    this.strokeColor = value;
+    this.strokeColorValue = value;
+    this.sendProperties();
   }
 
   onFillColorChange(value: string) {
-    this.fillColor = value;
+    this.fillColorValue = value;
+    this.sendProperties();
   }
 
-  onApply() {
+  onFillOpacityChange(value: string) {
+    this.fillOpacityValue = value;
+    this.sendProperties();
+  }
+
+  sendProperties() {
     this.propertiesService.updatePropertiesEventEmmiter.next({
       id: this.elementId,
       'stroke-width': this.strokeWidth,
-      stroke: this.strokeColor,
-      fill: this.fillColor,
+      stroke: this.strokeColorValue,
+      fill: this.fillColorValue,
+      'fill-opacity': this.fillOpacityValue,
     });
   }
 }

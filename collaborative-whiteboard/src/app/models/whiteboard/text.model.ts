@@ -6,7 +6,7 @@ import {
   CreateShapeAnchorsData,
 } from 'src/app/shared/create-shape-anchors-data.interface';
 
-export class Rectangle extends SvgObject {
+export class Text extends SvgObject {
   override setAnchors(anchors: HTMLElement[]): void {
     throw new Error('Method not implemented.');
   }
@@ -16,6 +16,8 @@ export class Rectangle extends SvgObject {
     createShapeAnchorsEventEmitter: Subject<CreateShapeAnchorsData>
   ) {
     super(svgElement, propertiesService, createShapeAnchorsEventEmitter);
+    svgElement.setAttributeNS(null, 'cursor', 'default');
+    svgElement.setAttributeNS(null, 'padding', '10px');
   }
 
   override getAnchors(): HTMLElement[] {

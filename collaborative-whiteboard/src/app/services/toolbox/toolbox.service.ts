@@ -6,6 +6,6 @@ import { Shape } from '../../enums/shape.enum';
   providedIn: 'root',
 })
 export class ToolboxService {
-  createShapeEventEmmiter = new Subject<Shape>();
-  activateDrawingModeEventEmmiter = new Subject<void>();
+  createShapeEventEmitter = new Subject<Shape>();
+  activateDrawingModeEventEmitter = new Subject<void>();
 }

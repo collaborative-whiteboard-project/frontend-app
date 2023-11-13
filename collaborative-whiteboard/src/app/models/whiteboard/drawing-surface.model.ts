@@ -86,7 +86,7 @@ export class DrawingSurface {
       this.drawingSurface.parentElement?.parentElement?.parentElement
         ?.parentElement?.parentElement?.parentElement?.offsetTop! +
       this.drawingSurface.parentElement?.parentElement?.parentElement
-        ?.parentElement?.scrollTop!;
+        ?.parentElement?.parentElement?.scrollTop!;
     return { surfaceX: x, surfaceY: y - 10 };
   }
 }

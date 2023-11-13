@@ -10,6 +10,7 @@
         [value]="strokeWidth"
         (change)="onStrokeChange(strokeSelect.value)"
       >
+        <option value="0">0</option>
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -24,7 +25,7 @@
         #strokeColor
         type="color"
         class="color-input"
-        [value]="strokeColor"
+        [value]="strokeColorValue"
         (change)="onStrokeColorChange(strokeColor.value)"
       />
     </div>
@@ -34,10 +35,18 @@
         #fillColor
         type="color"
         class="color-input"
-        [value]="fillColor"
+        [value]="fillColorValue"
         (change)="onFillColorChange(fillColor.value)"
       />
     </div>
+    <input
+      #fillOpacity
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      [value]="fillOpacityValue"
+      (change)="onFillOpacityChange(fillOpacity.value)"
+    />
   </div>
-  <p-button (onClick)="onApply()">Apply</p-button>
 </div>

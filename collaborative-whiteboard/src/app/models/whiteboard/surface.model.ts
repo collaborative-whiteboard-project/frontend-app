@@ -1,5 +1,3 @@
-import { Subject } from 'rxjs';
-import { SvgObject } from './svg-object.model';
 import { PropertiesService } from 'src/app/services/properties/properties.service';
 
 export class Surface {
