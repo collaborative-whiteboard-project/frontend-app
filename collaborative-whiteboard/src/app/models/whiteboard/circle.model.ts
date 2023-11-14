@@ -49,11 +49,7 @@ export class Circle extends SvgObject {
     this.anchors = anchors;
     this.anchors.forEach((anchor) => {
       anchor.addEventListener('mousedown', this.onMouseDownAnchor.bind(this));
-    });
-    this.anchors.forEach((anchor) => {
       anchor.addEventListener('mouseup', this.onMouseUpAnchor.bind(this));
-    });
-    this.anchors.forEach((anchor) => {
       anchor.addEventListener('mouseleave', this.onMouseLeaveAnchor.bind(this));
     });
     this.anchors[Anchor.TOP].addEventListener(
