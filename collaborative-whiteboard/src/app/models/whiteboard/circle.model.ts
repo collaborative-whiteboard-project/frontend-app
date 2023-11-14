@@ -7,6 +7,11 @@ import {
 } from 'src/app/shared/create-shape-anchors-data.interface';
 import { parseTransformAttribute } from 'src/app/helpers/parse-transform-attribute.helper';
 
+enum ResizeType {
+  REDUCE_RADIUS = 'reduce_radius',
+  INCREASE_RADIUS = 'increase_radius',
+}
+
 export class Circle extends SvgObject {
   constructor(
     svgElement: HTMLElement,
@@ -51,13 +56,21 @@ export class Circle extends SvgObject {
     this.anchors.forEach((anchor) => {
       anchor.addEventListener('mouseleave', this.onMouseLeaveAnchor.bind(this));
     });
-    this.anchors[0].addEventListener(
+    this.anchors[Anchor.TOP].addEventListener(
       'mousemove',
       this.onMouseMoveTopAnchor.bind(this)
     );
-    this.anchors[1].addEventListener(
+    this.anchors[Anchor.BOTTOM].addEventListener(
       'mousemove',
-      this.onMouseMoveTopAnchor.bind(this)
+      this.onMouseMoveBottomAnchor.bind(this)
+    );
+    this.anchors[Anchor.LEFT].addEventListener(
+      'mousemove',
+      this.onMouseMoveLeftAnchor.bind(this)
+    );
+    this.anchors[Anchor.RIGHT].addEventListener(
+      'mousemove',
+      this.onMouseMoveRightAnchor.bind(this)
     );
   }
 
@@ -87,49 +100,112 @@ export class Circle extends SvgObject {
       this.anchorDragX = mouseEvent.clientX;
       this.anchorDragY = mouseEvent.clientY;
 
-      const topAnchorTransform = parseTransformAttribute(
-        this.anchors[Anchor.TOP].getAttribute('transform')!
-      );
-      const bottomAnchorTransform = parseTransformAttribute(
-        this.anchors[Anchor.BOTTOM].getAttribute('transform')!
-      );
-      const leftAnchorTransform = parseTransformAttribute(
-        this.anchors[Anchor.LEFT].getAttribute('transform')!
-      );
-      const rightAnchorTransform = parseTransformAttribute(
-        this.anchors[Anchor.RIGHT].getAttribute('transform')!
-      );
-
-      const topTranslateX = topAnchorTransform[0].values[0];
-      const topTranslateY = topAnchorTransform[0].values[1];
-      this.anchors[Anchor.TOP].setAttribute(
-        'transform',
-        `translate(${topTranslateX}, ${+topTranslateY + +dy})`
-      );
-
-      const bottomTranslateX = bottomAnchorTransform[0].values[0];
-      const bottomTranslateY = bottomAnchorTransform[0].values[1];
-      this.anchors[Anchor.BOTTOM].setAttribute(
-        'transform',
-        `translate(${bottomTranslateX}, ${+bottomTranslateY - +dy})`
-      );
-
-      const leftTranslateX = leftAnchorTransform[0].values[0];
-      const leftTranslateY = leftAnchorTransform[0].values[1];
-      this.anchors[Anchor.LEFT].setAttribute(
-        'transform',
-        `translate(${+leftTranslateX + +dy}, ${leftTranslateY})`
-      );
-
-      const rightTranslateX = rightAnchorTransform[0].values[0];
-      const rightTranslateY = rightAnchorTransform[0].values[1];
-      this.anchors[Anchor.RIGHT].setAttribute(
-        'transform',
-        `translate(${+rightTranslateX - +dy}, ${+rightTranslateY})`
-      );
-
-      const r = this.svgElement.getAttribute('r')!;
-      this.svgElement.setAttribute('r', `${+r - dy}`);
+      if (dy < 0) {
+        this.resizeCircle(Math.abs(dy), ResizeType.INCREASE_RADIUS);
+      } else if (dy > 0) {
+        this.resizeCircle(Math.abs(dy), ResizeType.REDUCE_RADIUS);
+      }
     }
+  }
+
+  onMouseMoveBottomAnchor(event: Event) {
+    const mouseEvent = <MouseEvent>event;
+    if (this.anchorMouseDown) {
+      const dy = mouseEvent.clientY - this.anchorDragY;
+      this.anchorDragX = mouseEvent.clientX;
+      this.anchorDragY = mouseEvent.clientY;
+
+      if (dy < 0) {
+        this.resizeCircle(Math.abs(dy), ResizeType.REDUCE_RADIUS);
+      } else if (dy > 0) {
+        this.resizeCircle(Math.abs(dy), ResizeType.INCREASE_RADIUS);
+      }
+    }
+  }
+
+  onMouseMoveLeftAnchor(event: Event) {
+    const mouseEvent = <MouseEvent>event;
+    if (this.anchorMouseDown) {
+      const dx = mouseEvent.clientX - this.anchorDragX;
+      this.anchorDragX = mouseEvent.clientX;
+      this.anchorDragY = mouseEvent.clientY;
+
+      if (dx < 0) {
+        this.resizeCircle(Math.abs(dx), ResizeType.INCREASE_RADIUS);
+      } else if (dx > 0) {
+        this.resizeCircle(Math.abs(dx), ResizeType.REDUCE_RADIUS);
+      }
+    }
+  }
+
+  onMouseMoveRightAnchor(event: Event) {
+    const mouseEvent = <MouseEvent>event;
+    if (this.anchorMouseDown) {
+      const dx = mouseEvent.clientX - this.anchorDragX;
+      this.anchorDragX = mouseEvent.clientX;
+      this.anchorDragY = mouseEvent.clientY;
+
+      if (dx < 0) {
+        this.resizeCircle(Math.abs(dx), ResizeType.REDUCE_RADIUS);
+      } else if (dx > 0) {
+        this.resizeCircle(Math.abs(dx), ResizeType.INCREASE_RADIUS);
+      }
+    }
+  }
+
+  private resizeCircle(amount: number, resizeType: ResizeType) {
+    const directionCoefficient =
+      resizeType === ResizeType.INCREASE_RADIUS ? 1 : -1;
+    const topAnchorTransform = parseTransformAttribute(
+      this.anchors[Anchor.TOP].getAttribute('transform')!
+    );
+    const bottomAnchorTransform = parseTransformAttribute(
+      this.anchors[Anchor.BOTTOM].getAttribute('transform')!
+    );
+    const leftAnchorTransform = parseTransformAttribute(
+      this.anchors[Anchor.LEFT].getAttribute('transform')!
+    );
+    const rightAnchorTransform = parseTransformAttribute(
+      this.anchors[Anchor.RIGHT].getAttribute('transform')!
+    );
+
+    const topTranslateX = topAnchorTransform[0].values[0];
+    const topTranslateY = topAnchorTransform[0].values[1];
+    this.anchors[Anchor.TOP].setAttribute(
+      'transform',
+      `translate(${topTranslateX}, ${
+        +topTranslateY - +amount * directionCoefficient
+      })`
+    );
+
+    const bottomTranslateX = bottomAnchorTransform[0].values[0];
+    const bottomTranslateY = bottomAnchorTransform[0].values[1];
+    this.anchors[Anchor.BOTTOM].setAttribute(
+      'transform',
+      `translate(${bottomTranslateX}, ${
+        +bottomTranslateY + +amount * directionCoefficient
+      })`
+    );
+
+    const leftTranslateX = leftAnchorTransform[0].values[0];
+    const leftTranslateY = leftAnchorTransform[0].values[1];
+    this.anchors[Anchor.LEFT].setAttribute(
+      'transform',
+      `translate(${
+        +leftTranslateX - +amount * directionCoefficient
+      }, ${leftTranslateY})`
+    );
+
+    const rightTranslateX = rightAnchorTransform[0].values[0];
+    const rightTranslateY = rightAnchorTransform[0].values[1];
+    this.anchors[Anchor.RIGHT].setAttribute(
+      'transform',
+      `translate(${
+        +rightTranslateX + +amount * directionCoefficient
+      }, ${+rightTranslateY})`
+    );
+
+    const r = this.svgElement.getAttribute('r')!;
+    this.svgElement.setAttribute('r', `${+r + amount * directionCoefficient}`);
   }
 }
