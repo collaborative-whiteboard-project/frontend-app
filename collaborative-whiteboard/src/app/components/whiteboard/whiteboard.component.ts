@@ -1,5 +1,11 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  Inject,
+  OnInit,
+  OnDestroy,
+  HostListener,
+} from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 
 import { Shape } from '../../enums/shape.enum';
@@ -57,7 +63,6 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Prepare whiteboard grid
     const svg = <HTMLElement>this.document.getElementById('svg');
     svg.setAttribute('width', this.svgWidth);
     svg.setAttribute('height', this.svgHeight);
@@ -69,7 +74,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     this.svgObjectsGroup = <HTMLElement>this.document.getElementById('objects');
     this.svgAnchorsGroup = <HTMLElement>this.document.getElementById('anchors');
     const svgTempPath = <HTMLElement>this.document.getElementById('temp-path');
-
+    // Prepare whiteboard grid
     const surfaceModel = new Surface(
       svgSurface,
       this.propertiesService,
@@ -87,33 +92,6 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       svgTempPath,
       svgTempObjects
     );
-    this.document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        if (this.drawingModeActiveted) {
-          this.drawingSurfaceModel?.deactivateDrawinSurface();
-          this.drawingModeActiveted = false;
-        }
-        if (!!this.selectedElementId) {
-          const anchors = this.objects[this.selectedElementId!].getAnchors();
-          anchors.forEach((anchor) => {
-            this.svgAnchorsGroup?.removeChild(anchor);
-          });
-          this.selectedElementId = null;
-        }
-      } else if (event.key === 'Delete') {
-        if (!!this.selectedElementId) {
-          const anchors = this.objects[this.selectedElementId].getAnchors();
-          anchors.forEach((anchor) => {
-            this.svgAnchorsGroup?.removeChild(anchor);
-          });
-          const elementToDelete = <HTMLElement>(
-            this.document.getElementById(this.selectedElementId)
-          );
-          this.svgObjectsGroup?.removeChild(elementToDelete);
-          this.selectedElementId = null;
-        }
-      }
-    });
 
     this.createPathSub =
       this.drawingSurfaceModel.createPathEventEmmiter.subscribe((d: string) => {
@@ -162,6 +140,35 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
         }
       }
     );
+  }
+
+  @HostListener('window:keyup', ['$event'])
+  keyEvent(event: KeyboardEvent) {
+    if (event.code === 'Escape') {
+      if (this.drawingModeActiveted) {
+        this.drawingSurfaceModel?.deactivateDrawinSurface();
+        this.drawingModeActiveted = false;
+      }
+      if (!!this.selectedElementId) {
+        const anchors = this.objects[this.selectedElementId!].getAnchors();
+        anchors.forEach((anchor) => {
+          this.svgAnchorsGroup?.removeChild(anchor);
+        });
+        this.selectedElementId = null;
+      }
+    } else if (event.code === 'Delete') {
+      if (!!this.selectedElementId) {
+        const anchors = this.objects[this.selectedElementId].getAnchors();
+        anchors.forEach((anchor) => {
+          this.svgAnchorsGroup?.removeChild(anchor);
+        });
+        const elementToDelete = <HTMLElement>(
+          this.document.getElementById(this.selectedElementId)
+        );
+        this.svgObjectsGroup?.removeChild(elementToDelete);
+        this.selectedElementId = null;
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -224,7 +231,9 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       default:
         break;
     }
-    this.logger.info(`Model for shape with id: {${id}}`);
+    this.logger.info(
+      `createShapeModel: Created model for shape with id: {${id}}`
+    );
   }
 
   createShapeAnchors(anchorsCoordinates: AnchorCoordinates[]) {
