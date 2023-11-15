@@ -16,13 +16,13 @@ export class Path extends SvgObject {
   }
 
   override setAnchors(anchors: HTMLElement[]): void {
-    throw new Error('Method not implemented.');
+    return;
   }
   override getAnchors(): HTMLElement[] {
-    throw new Error('Method not implemented.');
+    return [];
   }
 
-  override getAnchorsCoordinates(): AnchorCoordinates[] | null {
-    return null;
+  override getAnchorsCoordinates(): AnchorCoordinates[] {
+    return [];
   }
 }

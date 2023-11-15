@@ -90,8 +90,6 @@ export abstract class SvgObject {
     this.mouseDown = false;
   }
 
-  abstract getAnchorsCoordinates(): AnchorCoordinates[] | null;
-
   onSelected() {
     const id = this.svgElement.getAttribute('id');
     const stroke = this.svgElement.getAttribute('stroke');
@@ -108,7 +106,7 @@ export abstract class SvgObject {
       });
     }
     const anchorsCoordinates = this.getAnchorsCoordinates();
-    if (!!anchorsCoordinates && !!id) {
+    if (!!id) {
       this.createShapeAnchorsEventEmitter.next({
         shapeId: id,
         anchorsCoordinates,
@@ -122,6 +120,7 @@ export abstract class SvgObject {
       .map(([key, value]) => this.svgElement.setAttributeNS(null, key, value));
   }
 
+  abstract getAnchorsCoordinates(): AnchorCoordinates[];
   abstract setAnchors(anchors: HTMLElement[]): void;
   abstract getAnchors(): HTMLElement[];
 }

@@ -31,6 +31,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
   objects: { [key: string]: SvgObject } = {};
   drawingSurfaceModel: DrawingSurface | null = null;
   selectedElementId: string | null = null;
+  drawingModeActiveted: boolean = false;
 
   createShapeAnchorsEventEmmiter = new Subject<CreateShapeAnchorsData>();
 
@@ -86,12 +87,17 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     );
     this.document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
-        //this.drawingSurfaceModel?.deactivateDrawinSurface();
-        const anchors = this.objects[this.selectedElementId!].getAnchors();
-        anchors.forEach((anchor) => {
-          this.svgAnchorsGroup?.removeChild(anchor);
-        });
-        this.selectedElementId = null;
+        if (this.drawingModeActiveted) {
+          this.drawingSurfaceModel?.deactivateDrawinSurface();
+          this.drawingModeActiveted = false;
+        }
+        if (!!this.selectedElementId) {
+          const anchors = this.objects[this.selectedElementId!].getAnchors();
+          anchors.forEach((anchor) => {
+            this.svgAnchorsGroup?.removeChild(anchor);
+          });
+          this.selectedElementId = null;
+        }
       } else if (event.key === 'Delete') {
         if (!!this.selectedElementId) {
           const anchors = this.objects[this.selectedElementId].getAnchors();
@@ -115,6 +121,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     this.activateDrawingModeSub =
       this.toolboxService.activateDrawingModeEventEmitter.subscribe(() => {
         this.drawingSurfaceModel?.activateDrawingSurface();
+        this.drawingModeActiveted = true;
       });
 
     this.updatePropertiesSub =
@@ -133,7 +140,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
 
         if (!!this.selectedElementId) {
           const oldSlectedElementAnchors =
-            this.objects[this.selectedElementId!].getAnchors();
+            this.objects[this.selectedElementId].getAnchors();
           oldSlectedElementAnchors.forEach((anchor) => {
             this.svgAnchorsGroup?.removeChild(anchor);
           });
@@ -141,13 +148,17 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
         }
 
         this.selectedElementId = data.shapeId;
-        const anchors = this.shapeCreationService.createElementAnchors(
-          data.anchorsCoordinates,
-          this.document
-        );
-        anchors.forEach((anchor) => this.svgAnchorsGroup?.appendChild(anchor));
-        this.objects[data.shapeId].setAnchors(anchors);
-        // TO DO: Send anchors to selectes shape model and add ther event listeners
+        if (data.anchorsCoordinates.length !== 0) {
+          const anchors = this.shapeCreationService.createElementAnchors(
+            data.anchorsCoordinates,
+            this.document
+          );
+          anchors.forEach((anchor) =>
+            this.svgAnchorsGroup?.appendChild(anchor)
+          );
+          this.objects[data.shapeId].setAnchors(anchors);
+        }
+        console.log(`Selected element id" ${this.selectedElementId}`);
       }
     );
   }
@@ -157,6 +168,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     this.updatePropertiesSub.unsubscribe();
     this.createPathSub.unsubscribe();
     this.activateDrawingModeSub.unsubscribe();
+    this.createShapeAnchorsSub.unsubscribe();
   }
 
   createNewFigure(shapeType: Shape, d?: string) {

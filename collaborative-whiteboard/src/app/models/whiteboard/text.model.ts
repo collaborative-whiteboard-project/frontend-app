@@ -24,7 +24,7 @@ export class Text extends SvgObject {
     throw new Error('Method not implemented.');
   }
 
-  override getAnchorsCoordinates(): AnchorCoordinates[] | null {
-    return null;
+  override getAnchorsCoordinates(): AnchorCoordinates[] {
+    return [];
   }
 }

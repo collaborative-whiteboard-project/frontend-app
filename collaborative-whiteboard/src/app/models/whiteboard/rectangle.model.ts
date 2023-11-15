@@ -16,7 +16,7 @@ export class Rectangle extends SvgObject {
     super(svgElement, propertiesService, createShapeAnchorsEventEmitter);
   }
 
-  override getAnchorsCoordinates(): AnchorCoordinates[] | null {
+  override getAnchorsCoordinates(): AnchorCoordinates[] {
     const x = +this.svgElement.getAttribute('x')!;
     const y = +this.svgElement.getAttribute('y')!;
     const width = +this.svgElement.getAttribute('width')!;

@@ -21,7 +21,7 @@ export class Circle extends SvgObject {
     super(svgElement, propertiesService, createShapeAnchorsEventEmitter);
   }
 
-  override getAnchorsCoordinates(): AnchorCoordinates[] | null {
+  override getAnchorsCoordinates(): AnchorCoordinates[] {
     const cx = +this.svgElement.getAttribute('cx')!;
     const cy = +this.svgElement.getAttribute('cy')!;
     const r = +this.svgElement.getAttribute('r')!;
