@@ -7,6 +7,7 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 import { ButtonModule } from 'primeng/button';
 import { MenubarModule } from 'primeng/menubar';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 
 import { AppComponent } from './app.component';
 import { EditorComponent } from './pages/editor/editor.component';
@@ -31,6 +32,12 @@ import { PropertiesComponent } from './components/properties/properties.componen
     InputTextModule,
     ColorPickerModule,
     InputNumberModule,
+    LoggerModule.forRoot({
+      //serverLoggingUrl: 'http://localhost:4200/', // Replace with YOUR API
+      level: NgxLoggerLevel.TRACE,
+      //serverLogLevel: NgxLoggerLevel.TRACE,
+      disableConsoleLogging: false,
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent],

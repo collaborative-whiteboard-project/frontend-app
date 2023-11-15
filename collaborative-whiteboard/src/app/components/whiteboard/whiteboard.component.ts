@@ -17,6 +17,7 @@ import {
   AnchorCoordinates,
   CreateShapeAnchorsData,
 } from 'src/app/shared/create-shape-anchors-data.interface';
+import { NGXLogger } from 'ngx-logger';
 
 @Component({
   selector: 'app-whiteboard',
@@ -42,6 +43,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
   createShapeAnchorsSub = new Subscription();
 
   constructor(
+    private logger: NGXLogger,
     @Inject(DOCUMENT) private document: Document,
     private shapeCreationService: ShapeCreationService,
     private toolboxService: ToolboxService,
@@ -158,7 +160,6 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
           );
           this.objects[data.shapeId].setAnchors(anchors);
         }
-        console.log(`Selected element id" ${this.selectedElementId}`);
       }
     );
   }
@@ -186,6 +187,9 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
   createShapeModel(shapeType: Shape, element: HTMLElement) {
     const id = element.getAttribute('id');
     if (!id) {
+      this.logger.error(
+        `createShapeModel: Element's property 'id' doesn't exist.`
+      );
       return;
     }
     switch (shapeType) {
@@ -220,6 +224,7 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       default:
         break;
     }
+    this.logger.info(`Model for shape with id: {${id}}`);
   }
 
   createShapeAnchors(anchorsCoordinates: AnchorCoordinates[]) {
