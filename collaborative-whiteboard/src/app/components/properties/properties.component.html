@@ -1,52 +1,143 @@
 <div *ngIf="elementSelected" class="properties">
   <h3>Properties</h3>
   <div class="content">
-    <div class="p-inputgroup">
-      <span class="p-inputgroup-addon"> Stroke width </span>
-      <select
-        #strokeSelect
-        name="stroke-width"
-        id="stroke-select"
-        [value]="strokeWidth"
-        (change)="onStrokeChange(strokeSelect.value)"
-      >
-        <option value="0">0</option>
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-      </select>
+    <!-- Position inputs -->
+    <div *ngIf="positionInputsActive" class="ngif">
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Pos X</span>
+        <input
+          #positionX
+          type="number"
+          [value]="positionXValue"
+          (change)="onPositionXChange(positionX.value)"
+        />
+      </div>
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Pos Y</span>
+        <input
+          #positionY
+          type="number"
+          [value]="positionYValue"
+          (change)="onPositionYChange(positionY.value)"
+        />
+      </div>
     </div>
-    <div class="p-inputgroup">
-      <span class="p-inputgroup-addon">Stroke</span>
-      <input
-        #strokeColor
-        type="color"
-        class="color-input"
-        [value]="strokeColorValue"
-        (change)="onStrokeColorChange(strokeColor.value)"
-      />
+    <!-- Dimiensions inputs -->
+    <div *ngIf="dimensionsInputsActive" class="ngif">
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Width</span>
+        <input
+          #width
+          type="number"
+          [value]="widthValue"
+          (change)="onWidthChange(width.value)"
+        />
+      </div>
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Height</span>
+        <input
+          #height
+          type="number"
+          [value]="heightValue"
+          (change)="onHeightChange(height.value)"
+        />
+      </div>
     </div>
-    <div class="p-inputgroup">
-      <span class="p-inputgroup-addon">Fill</span>
-      <input
-        #fillColor
-        type="color"
-        class="color-input"
-        [value]="fillColorValue"
-        (change)="onFillColorChange(fillColor.value)"
-      />
+    <!-- Radius input -->
+    <div *ngIf="radiusInputActive" class="ngif">
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Radius</span>
+        <input
+          #radius
+          type="number"
+          [value]="radiusValue"
+          (change)="onRadiusChange(radius.value)"
+        />
+      </div>
     </div>
-    <input
-      #fillOpacity
-      type="range"
-      min="0"
-      max="1"
-      step="0.01"
-      [value]="fillOpacityValue"
-      (change)="onFillOpacityChange(fillOpacity.value)"
-    />
+    <!-- Stroke inputs -->
+    <div *ngIf="strokeInputsActive" class="ngif">
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon"> Stroke width </span>
+        <select
+          #strokeSelect
+          name="stroke-width"
+          id="stroke-select"
+          [value]="strokeWidthValue"
+          (change)="onStrokeChange(strokeSelect.value)"
+        >
+          <option value="0">0</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="6">6</option>
+        </select>
+      </div>
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Stroke</span>
+        <input
+          #strokeColor
+          type="color"
+          class="color-input"
+          [value]="strokeColorValue"
+          (change)="onStrokeColorChange(strokeColor.value)"
+        />
+      </div>
+    </div>
+    <!-- Fill inputs -->
+    <div *ngIf="fillInputsActive" class="ngif" class="ngif">
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Fill</span>
+        <input
+          #fillColor
+          type="color"
+          class="color-input"
+          [value]="fillColorValue"
+          (change)="onFillColorChange(fillColor.value)"
+        />
+      </div>
+      <div class="fill-opacity">
+        <label>Fill opacity</label>
+        <input
+          #fillOpacity
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          [value]="fillOpacityValue"
+          (change)="onFillOpacityChange(fillOpacity.value)"
+        />
+      </div>
+    </div>
+    <!-- Text inputs -->
+    <div *ngIf="textInputsActive" class="ngif">
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Text</span>
+        <input
+          #text
+          type="text"
+          [value]="textValue"
+          (change)="onTextChange(text.value)"
+        />
+        <!-- <textarea
+          #text
+          [value]="textValue"
+          (change)="onTextChange(text.value)"
+        ></textarea> -->
+      </div>
+      <div class="p-inputgroup">
+        <span class="p-inputgroup-addon">Font size</span>
+        <input
+          id="font-size"
+          #fontSize
+          type="number"
+          class="color-input"
+          [value]="fontSizeValue"
+          (change)="onFontSizeChange(fontSize.value)"
+        />
+      </div>
+    </div>
   </div>
 </div>

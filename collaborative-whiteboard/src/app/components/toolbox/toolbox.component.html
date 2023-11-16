@@ -1,9 +1,43 @@
 <div class="toolbox">
   <div class="container">
     <div class="item" (click)="onGridItemClick(ShapeType.RECTANGLE)">
-      rectangle
+      <svg height="84" width="84" xmlns="http://www.w3.org/2000/svg">
+        <rect
+          class="icon"
+          x="1"
+          y="16"
+          width="80"
+          height="50"
+          stroke-width="2"
+          stroke="black"
+          fill="white"
+        ></rect>
+      </svg>
     </div>
-    <div class="item" (click)="onGridItemClick(ShapeType.CIRCLE)">circle</div>
+    <div class="item" (click)="onGridItemClick(ShapeType.CIRCLE)">
+      <svg height="84" width="84" xmlns="http://www.w3.org/2000/svg">
+        <circle
+          cx="42"
+          cy="42"
+          r="35"
+          stroke-width="2"
+          stroke="black"
+          fill="white"
+        ></circle>
+      </svg>
+    </div>
+    <div class="item" (click)="onGridItemClick(ShapeType.LINE)">
+      <svg height="84" width="84" xmlns="http://www.w3.org/2000/svg">
+        <line
+          x1="11"
+          y1="73"
+          x2="73"
+          y2="11"
+          stroke="black"
+          stroke-width="2"
+        ></line>
+      </svg>
+    </div>
     <!-- <div class="item" (click)="onGridItemClick(ShapeType.DIAMOND)">diamond</div> -->
     <div class="item" (click)="onGridItemClick(ShapeType.PATH)">pen</div>
     <div class="item" (click)="onGridItemClick(ShapeType.TEXT)">text</div>

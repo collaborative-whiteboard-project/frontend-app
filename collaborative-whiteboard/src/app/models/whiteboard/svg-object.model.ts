@@ -79,10 +79,16 @@ export abstract class SvgObject {
           );
         });
       }
+      this.propertiesService.sendPropertiesEventEmmiter.next(
+        this.getProperties()
+      );
     }
   }
 
   onMouseUp() {
+    this.propertiesService.sendPropertiesEventEmmiter.next(
+      this.getProperties()
+    );
     this.mouseDown = false;
   }
 
@@ -92,19 +98,9 @@ export abstract class SvgObject {
 
   onSelected() {
     const id = this.svgElement.getAttribute('id');
-    const stroke = this.svgElement.getAttribute('stroke');
-    const strokeWidth = this.svgElement.getAttribute('stroke-width');
-    const fill = this.svgElement.getAttribute('fill');
-    const fillOpacity = this.svgElement.getAttribute('fill-opacity');
-    if (!!id && !!stroke && !!strokeWidth && !!fill && !!fillOpacity) {
-      this.propertiesService.sendPropertiesEventEmmiter.next({
-        id,
-        stroke,
-        'stroke-width': strokeWidth,
-        fill,
-        'fill-opacity': fillOpacity,
-      });
-    }
+    this.propertiesService.sendPropertiesEventEmmiter.next(
+      this.getProperties()
+    );
     const anchorsCoordinates = this.getAnchorsCoordinates();
     if (!!id) {
       this.createShapeAnchorsEventEmitter.next({
@@ -114,13 +110,9 @@ export abstract class SvgObject {
     }
   }
 
-  updateProperties(properties: SvgElementProperties) {
-    Object.entries(properties)
-      .filter(([key, _]) => key !== 'id')
-      .map(([key, value]) => this.svgElement.setAttributeNS(null, key, value));
-  }
-
+  abstract updateProperties(properties: SvgElementProperties): void;
   abstract getAnchorsCoordinates(): AnchorCoordinates[];
   abstract setAnchors(anchors: HTMLElement[]): void;
   abstract getAnchors(): HTMLElement[];
+  abstract getProperties(): SvgElementProperties;
 }

@@ -3,4 +3,5 @@ export enum Shape {
   CIRCLE = 'circle',
   PATH = 'path',
   TEXT = 'text',
+  LINE = 'line',
 }

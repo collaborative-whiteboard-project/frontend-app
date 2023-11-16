@@ -6,6 +6,8 @@ import {
   CreateShapeAnchorsData,
 } from 'src/app/shared/create-shape-anchors-data.interface';
 import { parseTransformAttribute } from 'src/app/helpers/parse-transform-attribute.helper';
+import { SvgElementProperties } from 'src/app/shared/svg-element-properties.interface';
+import { Shape } from 'src/app/enums/shape.enum';
 
 export class Rectangle extends SvgObject {
   constructor(
@@ -23,20 +25,20 @@ export class Rectangle extends SvgObject {
     const height = +this.svgElement.getAttribute('height')!;
 
     const topAnchor: AnchorCoordinates = {
-      x: x + width / 2 + this.translateX - 8,
-      y: y + this.translateY - 14,
+      x: x + width / 2 + this.translateX - 10,
+      y: y + this.translateY - 18,
     };
     const bottomAnchor: AnchorCoordinates = {
-      x: x + width / 2 + this.translateX - 8,
+      x: x + width / 2 + this.translateX - 10,
       y: y + height + this.translateY - 2,
     };
     const leftAnchor: AnchorCoordinates = {
-      x: x + this.translateX - 14,
-      y: y + height / 2 + this.translateY - 8,
+      x: x + this.translateX - 18,
+      y: y + height / 2 + this.translateY - 10,
     };
     const rightAnchor: AnchorCoordinates = {
       x: x + width + this.translateX - 2,
-      y: y + height / 2 + this.translateY - 8,
+      y: y + height / 2 + this.translateY - 10,
     };
     return [topAnchor, bottomAnchor, leftAnchor, rightAnchor];
   }
@@ -70,6 +72,31 @@ export class Rectangle extends SvgObject {
     return this.anchors;
   }
 
+  override getProperties(): SvgElementProperties {
+    const id = this.svgElement.getAttribute('id')!;
+    const x = this.svgElement.getAttribute('x')!;
+    const y = this.svgElement.getAttribute('y')!;
+    const width = this.svgElement.getAttribute('width')!;
+    const height = this.svgElement.getAttribute('height')!;
+    const stroke = this.svgElement.getAttribute('stroke')!;
+    const strokeWidth = this.svgElement.getAttribute('stroke-width')!;
+    const fill = this.svgElement.getAttribute('fill')!;
+    const fillOpacity = this.svgElement.getAttribute('fill-opacity')!;
+
+    return {
+      id,
+      shapeType: Shape.RECTANGLE,
+      x: `${+x + this.translateX}`,
+      y: `${+y + this.translateY}`,
+      width,
+      height,
+      stroke,
+      'stroke-width': strokeWidth,
+      fill,
+      'fill-opacity': fillOpacity,
+    };
+  }
+
   onMouseDownAnchor(event: Event) {
     const mouseEvent = <MouseEvent>event;
     this.anchorDragX = mouseEvent.clientX;
@@ -78,10 +105,16 @@ export class Rectangle extends SvgObject {
   }
 
   onMouseUpAnchor() {
+    this.propertiesService.sendPropertiesEventEmmiter.next(
+      this.getProperties()
+    );
     this.anchorMouseDown = false;
   }
 
   onMouseLeaveAnchor() {
+    this.propertiesService.sendPropertiesEventEmmiter.next(
+      this.getProperties()
+    );
     this.anchorMouseDown = false;
   }
 
@@ -255,5 +288,26 @@ export class Rectangle extends SvgObject {
       const width = this.svgElement.getAttribute('width')!;
       this.svgElement.setAttribute('width', `${+width + dx}`);
     }
+  }
+
+  override updateProperties(properties: SvgElementProperties): void {
+    const x = +this.svgElement.getAttribute('x')!;
+    const y = +this.svgElement.getAttribute('y')!;
+    this.translateX = +properties.x! - x;
+    this.translateY = +properties.y! - y;
+    this.svgElement.setAttribute(
+      'transform',
+      `translate(${this.translateX}, ${this.translateY})`
+    );
+    this.svgElement.setAttribute('width', properties.width!);
+    this.svgElement.setAttribute('height', properties.height!);
+    this.svgElement.setAttribute('stroke', properties.stroke!);
+    this.svgElement.setAttribute('stroke-width', properties['stroke-width']!);
+    this.svgElement.setAttribute('fill', properties.fill!);
+    this.svgElement.setAttribute('fill-opacity', properties['fill-opacity']!);
+    this.createShapeAnchorsEventEmitter.next({
+      shapeId: properties.id,
+      anchorsCoordinates: this.getAnchorsCoordinates(),
+    });
   }
 }

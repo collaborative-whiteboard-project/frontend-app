@@ -24,6 +24,7 @@ import {
   CreateShapeAnchorsData,
 } from 'src/app/shared/create-shape-anchors-data.interface';
 import { NGXLogger } from 'ngx-logger';
+import { Line } from 'src/app/models/whiteboard/line.model';
 
 @Component({
   selector: 'app-whiteboard',
@@ -34,7 +35,10 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
   svgWidth = '1201';
   svgHeight = '801';
   svgObjectsGroup: HTMLElement | null = null;
+  svgObjectsShapesGroup: HTMLElement | null = null;
+  svgObjectsTextGroup: HTMLElement | null = null;
   svgAnchorsGroup: HTMLElement | null = null;
+  svgHelpersGroup: HTMLElement | null = null;
   objects: { [key: string]: SvgObject } = {};
   drawingSurfaceModel: DrawingSurface | null = null;
   selectedElementId: string | null = null;
@@ -71,8 +75,15 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     const svgTempObjects = <HTMLElement>(
       this.document.getElementById('temp-objects')
     );
+    this.svgObjectsShapesGroup = <HTMLElement>(
+      this.document.getElementById('shapes')
+    );
+    this.svgObjectsTextGroup = <HTMLElement>(
+      this.document.getElementById('text')
+    );
     this.svgObjectsGroup = <HTMLElement>this.document.getElementById('objects');
     this.svgAnchorsGroup = <HTMLElement>this.document.getElementById('anchors');
+    this.svgHelpersGroup = <HTMLElement>this.document.getElementById('helpers');
     const svgTempPath = <HTMLElement>this.document.getElementById('temp-path');
     // Prepare whiteboard grid
     const surfaceModel = new Surface(
@@ -114,16 +125,8 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
 
     this.createShapeAnchorsSub = this.createShapeAnchorsEventEmmiter.subscribe(
       (data) => {
-        if (data.shapeId === this.selectedElementId) {
-          return;
-        }
-
         if (!!this.selectedElementId) {
-          const oldSlectedElementAnchors =
-            this.objects[this.selectedElementId].getAnchors();
-          oldSlectedElementAnchors.forEach((anchor) => {
-            this.svgAnchorsGroup?.removeChild(anchor);
-          });
+          this.removeShapeAnchors(this.selectedElementId);
           this.selectedElementId = null;
         }
 
@@ -156,17 +159,25 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
         });
         this.selectedElementId = null;
       }
+      this.propertiesService.clearSelectedEventEmmiter.next();
     } else if (event.code === 'Delete') {
       if (!!this.selectedElementId) {
-        const anchors = this.objects[this.selectedElementId].getAnchors();
-        anchors.forEach((anchor) => {
-          this.svgAnchorsGroup?.removeChild(anchor);
-        });
+        const selectedElementModel = this.objects[this.selectedElementId];
+        this.removeShapeAnchors(this.selectedElementId!);
         const elementToDelete = <HTMLElement>(
           this.document.getElementById(this.selectedElementId)
         );
-        this.svgObjectsGroup?.removeChild(elementToDelete);
+        if (selectedElementModel instanceof Line) {
+          const wrapperElement = selectedElementModel.getWrapperElement();
+          this.svgHelpersGroup?.removeChild(wrapperElement);
+        }
+        if (selectedElementModel instanceof Text) {
+          this.svgObjectsTextGroup?.removeChild(elementToDelete);
+        } else {
+          this.svgObjectsShapesGroup?.removeChild(elementToDelete);
+        }
         this.selectedElementId = null;
+        this.propertiesService.clearSelectedEventEmmiter.next();
       }
     }
   }
@@ -179,15 +190,34 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     this.createShapeAnchorsSub.unsubscribe();
   }
 
+  removeShapeAnchors(elementId: string) {
+    const anchors = this.objects[elementId].getAnchors();
+    anchors.forEach((anchor) => {
+      this.svgAnchorsGroup?.removeChild(anchor);
+    });
+  }
+
   createNewFigure(shapeType: Shape, d?: string) {
     let newShape = this.shapeCreationService.createShape(
       shapeType,
       this.document,
       d
     );
-    if (!!newShape && !!this.svgObjectsGroup) {
-      this.svgObjectsGroup.appendChild(newShape);
-      this.createShapeModel(shapeType, newShape);
+    if (!!newShape && !!this.svgObjectsShapesGroup) {
+      if (shapeType !== Shape.TEXT) {
+        this.svgObjectsShapesGroup.appendChild(newShape);
+      } else {
+        this.svgObjectsTextGroup?.appendChild(newShape);
+      }
+      if (shapeType === Shape.LINE && !!this.svgHelpersGroup) {
+        const wrapperLine = this.shapeCreationService.createWrapperLine(
+          this.document
+        );
+        this.svgHelpersGroup.appendChild(wrapperLine!);
+        this.createLineModel(newShape, wrapperLine!);
+      } else {
+        this.createShapeModel(shapeType, newShape);
+      }
     }
   }
 
@@ -233,6 +263,16 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     }
     this.logger.info(
       `createShapeModel: Created model for shape with id: {${id}}`
+    );
+  }
+
+  createLineModel(svgLine: HTMLElement, svgLineWrapper: HTMLElement) {
+    const id = svgLine.getAttribute('id')!;
+    this.objects[id] = new Line(
+      svgLine,
+      svgLineWrapper,
+      this.createShapeAnchorsEventEmmiter,
+      this.propertiesService
     );
   }
 

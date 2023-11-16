@@ -1,5 +1,3 @@
-import { transform } from 'typescript';
-
 interface ParsedTransform {
   type: string;
   values: string[];

@@ -10,7 +10,7 @@ const defaultAttributes: { [key: string]: any } = {
     height: '100',
     width: '200',
     stroke: '#000000',
-    'stroke-width': '1',
+    'stroke-width': '2',
     fill: '#FFFFFF',
     'fill-opacity': '1',
   },
@@ -19,7 +19,7 @@ const defaultAttributes: { [key: string]: any } = {
     cy: '100',
     r: '50',
     stroke: '#000000',
-    'stroke-width': '1',
+    'stroke-width': '2',
     fill: '#FFFFFF',
     'fill-opacity': '1',
   },
@@ -34,6 +34,14 @@ const defaultAttributes: { [key: string]: any } = {
     y: '100',
     'font-size': '25',
     'fill-opacity': '1',
+  },
+  [Shape.LINE]: {
+    x1: '100',
+    y1: '200',
+    x2: '200',
+    y2: '100',
+    stroke: '#000000',
+    'stroke-width': '2',
   },
 };
 
@@ -55,6 +63,8 @@ export class ShapeCreationService {
       shapeName = 'path';
     } else if (shape === Shape.TEXT) {
       shapeName = 'text';
+    } else if (shape === Shape.LINE) {
+      shapeName = 'line';
     } else {
       return;
     }
@@ -73,7 +83,7 @@ export class ShapeCreationService {
     }
 
     if (shape == Shape.TEXT) {
-      newElement.innerHTML = 'New text';
+      newElement.innerHTML = 'Chrupek 🐱';
     }
 
     return newElement;
@@ -101,15 +111,26 @@ export class ShapeCreationService {
       const anchor = document.createElementNS(this.svgNamespace, 'rect');
       anchor.setAttributeNS(null, 'x', coordinates.x.toString());
       anchor.setAttributeNS(null, 'y', coordinates.y.toString());
-      anchor.setAttributeNS(null, 'width', '16');
-      anchor.setAttributeNS(null, 'height', '16');
+      anchor.setAttributeNS(null, 'width', '20');
+      anchor.setAttributeNS(null, 'height', '20');
       anchor.setAttributeNS(null, 'stroke-width', '1');
       anchor.setAttributeNS(null, 'stroke', '#000000');
-      anchor.setAttributeNS(null, 'fill', '#FFFFFF');
+      anchor.setAttributeNS(null, 'fill', 'transparent');
       anchor.setAttributeNS(null, 'transform', 'translate(0, 0)');
+      anchor.setAttributeNS(null, 'rx', '3');
+
       return <HTMLElement>anchor;
     });
 
     return anchors;
+  }
+
+  createWrapperLine(document: Document) {
+    const wrapperLine = this.createShape(Shape.LINE, document);
+    if (!!wrapperLine) {
+      wrapperLine.setAttribute('stroke-width', '40');
+      wrapperLine.setAttribute('stroke', 'transparent');
+    }
+    return wrapperLine;
   }
 }

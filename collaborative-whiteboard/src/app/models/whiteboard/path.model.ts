@@ -5,6 +5,8 @@ import {
   AnchorCoordinates,
   CreateShapeAnchorsData,
 } from 'src/app/shared/create-shape-anchors-data.interface';
+import { SvgElementProperties } from 'src/app/shared/svg-element-properties.interface';
+import { Shape } from 'src/app/enums/shape.enum';
 
 export class Path extends SvgObject {
   constructor(
@@ -25,4 +27,23 @@ export class Path extends SvgObject {
   override getAnchorsCoordinates(): AnchorCoordinates[] {
     return [];
   }
+
+  override getProperties(): SvgElementProperties {
+    const id = this.svgElement.getAttribute('id')!;
+    const stroke = this.svgElement.getAttribute('stroke')!;
+    const strokeWidth = this.svgElement.getAttribute('stroke-width')!;
+    const fill = this.svgElement.getAttribute('fill')!;
+    const fillOpacity = this.svgElement.getAttribute('fill-opacity')!;
+
+    return {
+      id,
+      shapeType: Shape.PATH,
+      stroke,
+      'stroke-width': strokeWidth,
+      fill,
+      'fill-opacity': fillOpacity,
+    };
+  }
+
+  override updateProperties(properties: SvgElementProperties): void {}
 }

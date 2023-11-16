@@ -32,13 +32,23 @@
     justify-content: center;
     align-items: center;
     background-color: white;
+
+    &:hover {
+        border: 2px solid black;
+        font-weight: bold;
+    }
+
+    &:active {
+        border: 0.5px solid black;
+    }
 }
 
-.item:hover {
-    border: 2px solid black;
-    font-weight: bold;
-}
+// .item:hover {
+//     border: 2px solid black;
+//     font-weight: bold;
+// }
 
-.item:active {
-    border: 0.5px solid black;
-}
+// .item:active {
+//     border: 0.5px solid black;
+// }
+
