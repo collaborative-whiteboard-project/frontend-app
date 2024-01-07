@@ -1,4 +1,6 @@
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -15,6 +17,14 @@ import { WhiteboardComponent } from './components/whiteboard/whiteboard.componen
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { ToolboxComponent } from './components/toolbox/toolbox.component';
 import { PropertiesComponent } from './components/properties/properties.component';
+import { AppRoutingModule } from './app-routing.module';
+import { AuthComponent } from './components/auth/auth.component';
+import { PasswordModule } from 'primeng/password';
+import { CardModule } from 'primeng/card';
+import { TabViewModule } from 'primeng/tabview';
+import { SignInComponent } from './components/sign-in/sign-in.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,8 +33,12 @@ import { PropertiesComponent } from './components/properties/properties.componen
     NavbarComponent,
     ToolboxComponent,
     PropertiesComponent,
+    AuthComponent,
+    SignInComponent,
+    SignUpComponent,
   ],
   imports: [
+    FormsModule,
     BrowserModule,
     BrowserAnimationsModule,
     ButtonModule,
@@ -32,12 +46,16 @@ import { PropertiesComponent } from './components/properties/properties.componen
     InputTextModule,
     ColorPickerModule,
     InputNumberModule,
+    CardModule,
+    PasswordModule,
+    TabViewModule,
     LoggerModule.forRoot({
       //serverLoggingUrl: 'http://localhost:4200/', // Replace with YOUR API
       level: NgxLoggerLevel.TRACE,
       //serverLogLevel: NgxLoggerLevel.TRACE,
       disableConsoleLogging: false,
     }),
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

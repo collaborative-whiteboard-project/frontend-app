@@ -45,5 +45,10 @@ export class Path extends SvgObject {
     };
   }
 
-  override updateProperties(properties: SvgElementProperties): void {}
+  override updateProperties(properties: SvgElementProperties): void {
+    this.svgElement.setAttribute('stroke', properties.stroke!);
+    this.svgElement.setAttribute('stroke-width', properties['stroke-width']!);
+    this.svgElement.setAttribute('fill', properties.fill!);
+    this.svgElement.setAttribute('fill-opacity', properties['fill-opacity']!);
+  }
 }
