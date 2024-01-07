@@ -1,0 +1,15 @@
+<div class="form-container">
+  <div class="form-input">
+    <label for="email">Email</label>
+    <input pInputText id="email" />
+  </div>
+
+  <div class="form-input">
+    <label for="password">Password</label>
+    <p-password formControlName="value" [feedback]="false"></p-password>
+    <small (click)="(1 === 1)">Reset password</small>
+  </div>
+  <div class="form-input">
+    <p-button>Sign in</p-button>
+  </div>
+</div>
