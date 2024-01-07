@@ -83,7 +83,7 @@ export class ShapeCreationService {
     }
 
     if (shape == Shape.TEXT) {
-      newElement.innerHTML = 'Chrupek 🐱';
+      newElement.innerHTML = 'New text';
     }
 
     return newElement;

@@ -1,0 +1,17 @@
+.form-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+small {
+    color: black;
+    cursor: pointer;
+}
+
+small:hover {
+    font-weight: bold;
+}
