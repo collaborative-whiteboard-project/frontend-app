@@ -1,0 +1,59 @@
+<div class="form-container">
+  <div class="form-input">
+    <label for="email">Email</label>
+    <input
+      pInputText
+      [email]="true"
+      id="emial"
+      [(ngModel)]="email"
+      (ngModelChange)="emailEmpty = false"
+    />
+    <small *ngIf="emailEmpty" class="empty-info">Email cannot be empty.</small>
+  </div>
+  <div class="form-input">
+    <label for="email">First name</label>
+    <input
+      pInputText
+      id="first-name"
+      [(ngModel)]="firstName"
+      (ngModelChange)="firstNameEmpty = false"
+    />
+    <small *ngIf="firstNameEmpty" class="empty-info"
+      >First name cannot be empty.</small
+    >
+  </div>
+  <div class="form-input">
+    <label for="email">Last name</label>
+    <input pInputText id="last-name" />
+  </div>
+  <div class="form-input">
+    <label for="password">Password</label>
+    <p-password
+      [feedback]="false"
+      [(ngModel)]="password"
+      (ngModelChange)="passwordEmpty = false"
+    ></p-password>
+    <small *ngIf="passwordEmpty" class="empty-info"
+      >Password must be empty.</small
+    >
+  </div>
+
+  <div class="form-input">
+    <label for="repeat-password">Confirm password</label>
+    <p-password
+      [feedback]="false"
+      [(ngModel)]="passwordConfirmation"
+      (ngModelChange)="onPasswordConfirmationChange()"
+    ></p-password>
+    <small *ngIf="passwordConfirmationEmpty" class="empty-info"
+      >Password confirmation cannot be empty.</small
+    >
+    <small *ngIf="passwordConfirmationIncorrect" class="empty-info"
+      >Passwords not identical.</small
+    >
+  </div>
+
+  <div class="form-input">
+    <p-button (onClick)="onSignUp()">Sign up</p-button>
+  </div>
+</div>

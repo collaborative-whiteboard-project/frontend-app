@@ -1,0 +1,65 @@
+.properties {
+    height: 100%;
+    width: 100%;
+    padding: 5px;
+    border: 1px solid rgb(161, 161, 161);
+    border-radius: 5px;
+    background-color: rgb(250, 250, 250);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+:host::ng-deep {
+    .p-inputgroup {
+        display: flex;
+        justify-content: flex-start;
+        margin: 8px 0;
+
+        input {
+            border-width: 1px;
+            border-color: rgb(206,212, 218);
+            width: 120px;
+            text-align: center;
+        }
+
+        textarea { 
+            resize: none;
+            text-align: center;
+        }
+
+        #font-size {
+            width: 50px;
+            text-align: center;
+        }
+    }    
+}
+
+.ngif {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#stroke-select {
+    border-color: rgb(206, 212, 218);
+    border-radius: 0 5px 5px 0;
+}
+
+
+
+.color-input {
+    height: 50px;
+    width: 30%;
+    border-color: rgb(206, 212, 218);
+}
+
+.fill-opacity {
+    margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,0 +1,29 @@
+<div class="form-container">
+  <div class="form-input">
+    <label for="email">Email</label>
+    <input
+      pInputText
+      id="email"
+      [email]="true"
+      [(ngModel)]="email"
+      (input)="emailEmpty = false"
+    />
+    <small *ngIf="emailEmpty" class="empty-info">Email cannot be empty.</small>
+  </div>
+
+  <div class="form-input">
+    <label for="password">Password</label>
+    <p-password
+      [feedback]="false"
+      [(ngModel)]="password"
+      (ngModelChange)="passwordEmpty = false"
+    ></p-password>
+    <small *ngIf="passwordEmpty" class="empty-info"
+      >Password cannot be empty.</small
+    ><br />
+    <small>Reset password</small>
+  </div>
+  <div class="form-input">
+    <p-button (onClick)="onSignIn()">Sign in</p-button>
+  </div>
+</div>

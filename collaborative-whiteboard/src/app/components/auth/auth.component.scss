@@ -1,0 +1,50 @@
+.login-screen {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    background-color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+small {
+    color: black;
+}
+
+small:hover {
+    font-weight: bold;
+}
+
+:host ::ng-deep {
+    .p-card {
+        margin: 10vh;
+        width: 20vw;
+       // height: 50vh;
+        //background-color: rgb(248, 249, 250);
+    }
+
+    .p-card-content {
+        display: flex;
+        justify-content: center;
+    }
+
+    // .p-tabview {
+    //     display: flex;
+    // }
+
+    .p-tabview-nav {
+        display: flex;
+        justify-content: center
+    }
+
+    // .p-tabviw-panels {
+    //     display: flex;
+    //     justify-content: center
+    // }
+
+    .p-tabview-panel {
+        width: 250px;
+    }
+}

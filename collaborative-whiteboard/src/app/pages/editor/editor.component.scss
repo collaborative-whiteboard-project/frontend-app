@@ -1,0 +1,28 @@
+.container {
+    position:relative;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.toolbox-container {
+    height: 80vh;
+    width: 15vw;
+    padding: 5px
+    // background-color: aqua;
+}
+
+.whiteboard-container {
+    width: 65vw;
+    height: 85vh;
+    margin: 10px;
+    overflow: auto;
+}
+
+.properties-container {
+    width: 17vw;
+    padding: 5px;
+    height: 80vh;  
+    // background-color: aqua;
+}
