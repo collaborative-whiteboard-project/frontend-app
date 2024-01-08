@@ -6,3 +6,11 @@
     align-items: center;
     gap: 15px;
 }
+
+.empty-info {
+    color: red;
+}
+
+.empty-info:hover {
+    font-weight: 400;
+}
