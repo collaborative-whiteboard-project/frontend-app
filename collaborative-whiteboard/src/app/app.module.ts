@@ -3,6 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { ColorPickerModule } from 'primeng/colorpicker';
@@ -38,7 +39,6 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
     SignUpComponent,
   ],
   imports: [
-    FormsModule,
     BrowserModule,
     BrowserAnimationsModule,
     ButtonModule,
@@ -56,6 +56,8 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
       disableConsoleLogging: false,
     }),
     AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
