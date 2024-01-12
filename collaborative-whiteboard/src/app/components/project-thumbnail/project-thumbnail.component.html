@@ -1,0 +1,20 @@
+<p-card styleClass="shadow-4">
+  <div class="thumbnail-container">
+    <p
+      style="
+        font-size: 1.5rem;
+        margin-top: 0;
+        margin-bottom: 1fr;
+        text-align: center;
+      "
+    >
+      {{ projectName }}
+    </p>
+    <p-splitButton
+      icon="pi pi-pencil"
+      label="Open project"
+      styleClass="p-button-raised"
+      [model]="dropDownItems"
+    ></p-splitButton>
+  </div>
+</p-card>

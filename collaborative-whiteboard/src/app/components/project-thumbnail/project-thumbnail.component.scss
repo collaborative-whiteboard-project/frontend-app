@@ -1,0 +1,22 @@
+.thumbnail-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+:host::ng-deep {
+    .p-splitbutton {
+        min-height: 3rem;
+        margin: 1fr;
+    }
+
+    .p-card {
+        max-width: 17rem;
+        min-height: 10rem;
+    }
+
+    .p-card-body {
+        padding: 1fr;
+    }
+}
