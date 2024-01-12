@@ -1,0 +1,38 @@
+.dashboard-container {
+    width: 100%;
+    padding: 10px;
+    //background-color: aqua;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.sidebar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.projects-container-content {
+    max-width: 60rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 2rem;
+}
+
+.grid-element {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+:host::ng-deep {
+    .sidebar-container {
+        .p-card-body {
+            padding: 0;
+        }
+    }
+}

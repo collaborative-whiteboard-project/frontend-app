@@ -19,8 +19,8 @@ small:hover {
 
 :host ::ng-deep {
     .p-card {
-        margin: 10vh;
-        width: 20vw;
+        margin-top: 10vh;
+        min-width: 20vw;
        // height: 50vh;
         //background-color: rgb(248, 249, 250);
     }

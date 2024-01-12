@@ -3,5 +3,97 @@
     <ng-template pTemplate="start">
       <p>Collaborative Whiteboard</p>
     </ng-template>
+    <ng-template pTemplate="end" *ngIf="userLoggedIn">
+      <!-- <i
+        class="pi pi-user user-icon"
+        style="font-size: 1.2rem"
+        (click)="showUserDialog()"
+      ></i> -->
+      <p-menu #menu [model]="userMenuItems" [popup]="true"></p-menu>
+      <div
+        (click)="menu.toggle($event)"
+        class="flex justify-content-center align-items-center"
+      >
+        <i
+          class="pi pi-angle-down"
+          [style]="{
+            cursor: 'pointer'
+          }"
+        ></i>
+        <p-avatar
+          shape="circle"
+          size="normal"
+          [style]="{
+            cursor: 'pointer',
+            'background-color': '#2196F3',
+            color: 'white',
+            'margin-left': '0.5rem'
+          }"
+          >L</p-avatar
+        >
+      </div>
+    </ng-template>
   </p-menubar>
 </div>
+<p-dialog
+  header="User settings"
+  [(visible)]="userSettingsVisible"
+  [style]="{ 'max-width': '40vw' }"
+>
+  <p-tabView>
+    <p-tabPanel header="User details">
+      <div class="info-container">
+        <div class="flex flex-row gap-1 justify-content-start flex-wrap">
+          <label class="flex align-items-center">Email:</label>
+          <p-chip label="some@email.com"></p-chip>
+        </div>
+        <div class="flex flex-column gap-1 max-w-full">
+          <label>First name</label>
+          <input pInputText />
+        </div>
+        <div class="flex flex-column gap-1 max-w-full">
+          <label>Last name</label>
+          <input pInputText />
+        </div>
+        <div class="flex justify-content-center gap-4 mt-3 flex-wrap">
+          <p-button
+            severity="primary"
+            [outlined]="true"
+            [raised]="true"
+            (onClick)="closeUserSettings()"
+            >Cancel</p-button
+          >
+          <p-button [raised]="true" [disabled]="true">Change</p-button>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Change password">
+      <div class="change-password-container">
+        <div class="flex flex-column gap-1">
+          <label>New password</label>
+          <p-password
+            inputStyleClass="max-w-full"
+            styleClass="max-w-full"
+          ></p-password>
+        </div>
+        <div class="flex flex-column gap-1">
+          <label>Password confirmation</label>
+          <p-password
+            inputStyleClass="max-w-full"
+            styleClass="max-w-full"
+          ></p-password>
+        </div>
+      </div>
+      <div class="flex justify-content-center gap-4 mt-3 flex-wrap">
+        <p-button
+          severity="primary"
+          [outlined]="true"
+          [raised]="true"
+          (onClick)="closeUserSettings()"
+          >Cancel</p-button
+        >
+        <p-button [raised]="true" [disabled]="true">Change</p-button>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>

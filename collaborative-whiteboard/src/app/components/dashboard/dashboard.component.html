@@ -1,1 +1,17 @@
-<p>dashboard works!</p>
+<div class="dashboard-container">
+  <div class="sidebar-container">
+    <p-card styleClass="shadow-4">
+      <div class="flex justify-content-center"><p>Nikodem Polak</p></div>
+    </p-card>
+    <p-menu [model]="items" styleClass="shadow-4"></p-menu>
+  </div>
+  <p-card styleClass="shadow-4">
+    <div class="projects-container-content">
+      <div class="grid-element" *ngFor="let project of projects">
+        <app-project-thumbnail
+          [projectName]="project.name"
+        ></app-project-thumbnail>
+      </div>
+    </div>
+  </p-card>
+</div>

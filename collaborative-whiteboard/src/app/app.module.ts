@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
+import { MenuModule } from 'primeng/menu';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { ColorPickerModule } from 'primeng/colorpicker';
@@ -26,7 +27,11 @@ import { TabViewModule } from 'primeng/tabview';
 import { SignInComponent } from './components/sign-in/sign-in.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-
+import { ProjectThumbnailComponent } from './components/project-thumbnail/project-thumbnail.component';
+import { SplitButtonModule } from 'primeng/splitbutton';
+import { DialogModule } from 'primeng/dialog';
+import { ChipModule } from 'primeng/chip';
+import { AvatarModule } from 'primeng/avatar';
 @NgModule({
   declarations: [
     AppComponent,
@@ -39,6 +44,7 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     SignInComponent,
     SignUpComponent,
     DashboardComponent,
+    ProjectThumbnailComponent,
   ],
   imports: [
     BrowserModule,
@@ -51,6 +57,11 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     CardModule,
     PasswordModule,
     TabViewModule,
+    MenuModule,
+    SplitButtonModule,
+    DialogModule,
+    ChipModule,
+    AvatarModule,
     LoggerModule.forRoot({
       //serverLoggingUrl: 'http://localhost:4200/', // Replace with YOUR API
       level: NgxLoggerLevel.TRACE,
