@@ -127,7 +127,7 @@ export abstract class SvgObject {
 
   onMouseLeave(event: Event) {
     this.mouseDown = false;
-
+    event.preventDefault();
     if (this.dragOperation) {
       this.endShapeDragEventEmitter.next({
         id: this.svgElement.getAttribute('id')!,

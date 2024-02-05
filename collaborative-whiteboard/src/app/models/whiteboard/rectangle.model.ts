@@ -172,6 +172,7 @@ export class Rectangle extends SvgObject {
 
   onMouseMoveTopAnchor(event: Event) {
     const mouseEvent = <MouseEvent>event;
+    event.preventDefault();
     if (this.anchorMouseDown && this.canUserEdit) {
       const dy = mouseEvent.clientY - this.anchorDragY;
       this.anchorDragX = mouseEvent.clientX;
