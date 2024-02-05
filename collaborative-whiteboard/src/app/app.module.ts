@@ -3,7 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { MenuModule } from 'primeng/menu';
 
 import { InputTextModule } from 'primeng/inputtext';
@@ -32,6 +32,21 @@ import { SplitButtonModule } from 'primeng/splitbutton';
 import { DialogModule } from 'primeng/dialog';
 import { ChipModule } from 'primeng/chip';
 import { AvatarModule } from 'primeng/avatar';
+import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
+import { UserPanelComponent } from './components/user-panel/user-panel.component';
+import { TableModule } from 'primeng/table';
+import { DropdownModule } from 'primeng/dropdown';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { ListboxModule } from 'primeng/listbox';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { ManageProjectPanelComponent } from './components/manage-project-panel/manage-project-panel.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { MembersListComponent } from './components/members-list/members-list.component';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -45,6 +60,12 @@ import { AvatarModule } from 'primeng/avatar';
     SignUpComponent,
     DashboardComponent,
     ProjectThumbnailComponent,
+    AdminPanelComponent,
+    UserPanelComponent,
+    ManageProjectPanelComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
+    MembersListComponent,
   ],
   imports: [
     BrowserModule,
@@ -62,6 +83,12 @@ import { AvatarModule } from 'primeng/avatar';
     DialogModule,
     ChipModule,
     AvatarModule,
+    TableModule,
+    DropdownModule,
+    ConfirmDialogModule,
+    ToastModule,
+    ListboxModule,
+    SelectButtonModule,
     LoggerModule.forRoot({
       //serverLoggingUrl: 'http://localhost:4200/', // Replace with YOUR API
       level: NgxLoggerLevel.TRACE,
@@ -72,7 +99,11 @@ import { AvatarModule } from 'primeng/avatar';
     FormsModule,
     HttpClientModule,
   ],
-  providers: [],
+  providers: [
+    ConfirmationService,
+    MessageService,
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

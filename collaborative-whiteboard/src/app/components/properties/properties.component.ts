@@ -1,8 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Shape } from 'src/app/enums/shape.enum';
+import { parseTransformAttribute } from 'src/app/helpers/parse-transform-attribute.helper';
 
 import { PropertiesService } from 'src/app/services/properties/properties.service';
+import { SocketService } from 'src/app/services/socket/socket.service';
 
 @Component({
   selector: 'app-properties',
@@ -34,8 +36,12 @@ export class PropertiesComponent implements OnInit, OnDestroy {
   fillOpacityValue: string | undefined;
   fontSizeValue: string | undefined;
   textValue: string | undefined;
+  transform: string | undefined;
 
-  constructor(private propertiesService: PropertiesService) {
+  constructor(
+    private propertiesService: PropertiesService,
+    private socketService: SocketService
+  ) {
     this.elementPropertiesSub =
       this.propertiesService.sendPropertiesEventEmmiter.subscribe(
         (properties) => {
@@ -54,6 +60,7 @@ export class PropertiesComponent implements OnInit, OnDestroy {
           this.fontSizeValue = properties['font-size'];
           this.calulateActiveInputs(this.elementType);
           this.elementSelected = true;
+          this.transform = properties.transform;
         }
       );
 
@@ -84,56 +91,91 @@ export class PropertiesComponent implements OnInit, OnDestroy {
   onStrokeChange(value: string) {
     this.strokeWidthValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('stroke-width', value);
   }
 
   onStrokeColorChange(value: string) {
     this.strokeColorValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('stroke-color', value);
   }
 
   onFillColorChange(value: string) {
     this.fillColorValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('fill-color', value);
   }
 
   onFillOpacityChange(value: string) {
     this.fillOpacityValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('fill-opacity', value);
   }
 
   onPositionXChange(value: string) {
+    const parsedTransform = parseTransformAttribute(this.transform!);
+    const translateX = parsedTransform[0].values[0];
+    const translateY = parsedTransform[0].values[1];
+    const x = +this.positionXValue! - +translateX;
+    const newTranslateX = +value - x;
+    //this.sendProperties();
+    this.transform = `translate(${newTranslateX}, ${translateY})`;
     this.positionXValue = value;
-    this.sendProperties();
+    this.emitChangeUsingSocket(
+      'transform',
+      `translate(${newTranslateX}, ${translateY})`
+    );
   }
 
   onPositionYChange(value: string) {
+    //this.sendProperties();
+    const parsedTransform = parseTransformAttribute(this.transform!);
+    const translateX = parsedTransform[0].values[0];
+    const translateY = parsedTransform[0].values[1];
+    const y = +this.positionYValue! - +translateY;
+    const newTranslateY = +value - y;
     this.positionYValue = value;
-    this.sendProperties();
+    this.transform = `translate(${translateX}, ${newTranslateY})`;
+    this.emitChangeUsingSocket(
+      'transform',
+      `translate(${translateX}, ${newTranslateY})`
+    );
   }
 
   onWidthChange(value: string) {
     this.widthValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('width', value);
   }
 
   onHeightChange(value: string) {
     this.heightValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('height', value);
   }
 
   onRadiusChange(value: string) {
     this.radiusValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('radius', value);
   }
 
   onTextChange(value: string) {
     this.textValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('text', value);
   }
 
   onFontSizeChange(value: string) {
     this.fontSizeValue = value;
     this.sendProperties();
+    this.emitChangeUsingSocket('font-size', value);
+  }
+
+  emitChangeUsingSocket(name: string, value: string) {
+    if (this.propertiesService.canUserEdit) {
+      this.socketService.updateWhiteboardElement(this.elementId!, name, value);
+    }
   }
 
   sendProperties() {
@@ -151,6 +193,7 @@ export class PropertiesComponent implements OnInit, OnDestroy {
       'fill-opacity': this.fillOpacityValue,
       text: this.textValue,
       'font-size': this.fontSizeValue,
+      transform: '',
     });
   }
 

@@ -1,0 +1,150 @@
+<p-dialog
+  [(visible)]="manageProjectDialogVisible"
+  header="Manage project"
+  (onHide)="closeDialog()"
+  (onShow)="showDialog()"
+>
+  <div *ngIf="!!project" class="flex flex-column gap-2">
+    <div class="flex flex-column">
+      <label>Project name</label>
+      <input pInputText [(ngModel)]="projectCopy.name" />
+    </div>
+    <div>
+      <label>Project members</label>
+      <p-table
+        [value]="projectCopy.members"
+        [scrollable]="true"
+        (onRowSelect)="onMemberSelection($event)"
+        scrollHeight="30vh"
+        selectionMode="single"
+        dataKey="id"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Email</th>
+            <th>Role</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-member>
+          <tr [pSelectableRow]="member">
+            <td>{{ member.memberEmail }}</td>
+            <td>{{ member.memberRole.toUpperCase() }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <button
+      pButton
+      icon="pi pi-user-plus"
+      class="flex justify-content-center p-button-link gap-2"
+      (click)="onAddMember()"
+    >
+      Add project member
+    </button>
+    <div class="flex flex-row max-w-full justify-content-center gap-2">
+      <button
+        pButton
+        class="flex justify-content-center w-full"
+        (click)="saveProjectChanges()"
+      >
+        Save
+      </button>
+      <button
+        pButton
+        class="flex justify-content-center p-button-danger w-full"
+        (click)="onProjectDelete()"
+      >
+        Delete
+      </button>
+    </div>
+    <button
+      pButton
+      class="flex justify-content-center p-button-outlined"
+      (click)="onCancel()"
+    >
+      Cancel
+    </button>
+  </div>
+</p-dialog>
+<p-dialog
+  header="Member details"
+  [(visible)]="memberDialogVisible"
+  [style]="{ 'max-width': '30vw', height: 'auto' }"
+>
+  <div
+    *ngIf="selectedProjectMember !== null"
+    class="flex flex-column gap-3 max-w-full"
+  >
+    <div class="flex flex-column">
+      <label>Email</label>
+      <p-chip
+        label="{{ selectedProjectMember.memberEmail }}"
+        styleClass="max-w-full"
+      ></p-chip>
+    </div>
+    <div class="flex flex-column">
+      <label>Member role</label>
+      <p-selectButton
+        [options]="memberRoleOptions"
+        [(ngModel)]="selectedProjectMember.memberRole"
+        [multiple]="false"
+        [required]="true"
+      ></p-selectButton>
+    </div>
+    <button
+      pButton
+      class="flex justify-content-center"
+      (click)="onMemberChangesSave()"
+    >
+      Save
+    </button>
+    <button
+      pButton
+      class="flex justify-content-center p-button-danger"
+      (click)="onMemberDelete()"
+    >
+      Delete
+    </button>
+    <button
+      pButton
+      class="flex justify-content-center p-button-outlined"
+      (click)="onMemberCancel()"
+    >
+      Cancel
+    </button>
+  </div>
+</p-dialog>
+<p-dialog
+  header="Add new project memeber"
+  [(visible)]="addMemberDialogVisible"
+  [style]="{ 'max-width': '30vw', height: 'auto' }"
+>
+  <div class="flex flex-column gap-2 max-w-full">
+    <div class="flex flex-column">
+      <label>User email</label>
+      <input pInputText [(ngModel)]="newMemberEmail" />
+    </div>
+    <p-selectButton
+      [options]="memberRoleOptions"
+      [(ngModel)]="newMemberRole"
+      [multiple]="false"
+      [required]="true"
+    ></p-selectButton>
+    <div class="flex flex-row w-full justify-content-center gap-2">
+      <button
+        pButton
+        class="flex justify-content-center w-full"
+        (click)="onAddNewMemberButton()"
+      >
+        Add
+      </button>
+      <button
+        pButton
+        class="flex justify-content-center p-button-outlined w-full"
+        (click)="onAddMemberCancelButton()"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+</p-dialog>

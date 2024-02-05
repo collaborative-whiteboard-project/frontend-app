@@ -17,10 +17,12 @@
 }
 
 .projects-container-content {
+    min-width: 40rem;
     max-width: 60rem;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
     gap: 2rem;
+    min-height: 10rem;
 }
 
 .grid-element {

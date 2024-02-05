@@ -3,13 +3,14 @@ import { NgModule } from '@angular/core';
 import { AuthComponent } from './components/auth/auth.component';
 import { EditorComponent } from './pages/editor/editor.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 const appRoutes: Routes = [
   { path: '', component: AuthComponent },
-  { path: 'whiteboard/:id', component: EditorComponent },
+  { path: 'whiteboard/:id/:name', component: EditorComponent },
   { path: 'dashboard', component: DashboardComponent },
-  // {path: 'not-found', component: PageNotFoundComponent},
-  // {path: '**',  redirectTo: '/not-found'}
+  { path: 'reset/password/:token', component: ResetPasswordComponent },
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({

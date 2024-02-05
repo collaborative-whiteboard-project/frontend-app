@@ -1,7 +1,7 @@
 export enum Shape {
-  RECTANGLE = 'rect',
-  CIRCLE = 'circle',
-  PATH = 'path',
-  TEXT = 'text',
-  LINE = 'line',
+  RECTANGLE = 'RECTANGLE',
+  CIRCLE = 'CIRCLE',
+  PATH = 'PATH',
+  TEXT = 'TEXT',
+  LINE = 'LINE',
 }

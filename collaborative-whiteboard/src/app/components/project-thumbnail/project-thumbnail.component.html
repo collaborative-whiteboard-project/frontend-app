@@ -8,9 +8,10 @@
         text-align: center;
       "
     >
-      {{ projectName }}
+      {{ project?.name }}
     </p>
     <p-splitButton
+      (onClick)="onProjectEdit()"
       icon="pi pi-pencil"
       label="Open project"
       styleClass="p-button-raised"
@@ -18,3 +19,12 @@
     ></p-splitButton>
   </div>
 </p-card>
+<app-manage-project-panel
+  [(manageProjectDialogVisible)]="manageProjectDialogVisible"
+  [project]="project"
+  (changesApplied)="onChangesApplied()"
+></app-manage-project-panel>
+<app-members-list
+  [(membersListVisible)]="membersListVisible"
+  [members]="project?.members!"
+></app-members-list>

@@ -7,4 +7,5 @@ export class PropertiesService {
   clearSelectedEventEmmiter = new Subject<void>();
   updatePropertiesEventEmmiter = new Subject<SvgElementProperties>();
   sendPropertiesEventEmmiter = new Subject<SvgElementProperties>();
+  canUserEdit = false;
 }

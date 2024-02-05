@@ -1,17 +1,41 @@
 <div class="dashboard-container">
   <div class="sidebar-container">
     <p-card styleClass="shadow-4">
-      <div class="flex justify-content-center"><p>Nikodem Polak</p></div>
+      <div class="flex justify-content-center">
+        <p>{{ username }}</p>
+      </div>
     </p-card>
-    <p-menu [model]="items" styleClass="shadow-4"></p-menu>
+    <p-menu [model]="displayProjectsItems" styleClass="shadow-4"></p-menu>
+    <p-menu [model]="createProjectItems" styleClass="shadow-4"></p-menu>
   </div>
   <p-card styleClass="shadow-4">
     <div class="projects-container-content">
-      <div class="grid-element" *ngFor="let project of projects">
+      <div class="grid-element" *ngFor="let project of projectsToDisplay">
         <app-project-thumbnail
-          [projectName]="project.name"
+          [project]="project"
+          (changesApplied)="onChangesApplied()"
         ></app-project-thumbnail>
+      </div>
+      <div
+        *ngIf="projects.length === 0"
+        class="flex justify-content-center align-items-center"
+      >
+        <p>You have no projects.</p>
       </div>
     </div>
   </p-card>
 </div>
+<p-dialog
+  header="Create Projct"
+  [(visible)]="createProjectPanelVisible"
+  (onHide)="closeCreateProjectPanel()"
+  [style]="{ 'max-width': '40vw' }"
+>
+  <div class="flex flex-column gap-2 align-items-center">
+    <div class="flex flex-column gap-1">
+      <label>Project name</label>
+      <input pInputText [(ngModel)]="newProjectName" />
+    </div>
+    <p-button [raised]="true" (onClick)="onCreateProject()">Create</p-button>
+  </div>
+</p-dialog>

@@ -1,0 +1,221 @@
+<p-dialog
+  header="Admin settings"
+  [(visible)]="adminPanelVisible"
+  (onHide)="closeAdminPanel()"
+  (onShow)="showAdminPanel()"
+  [style]="{ 'max-width': '55vw' }"
+>
+  <p-tabView>
+    <p-tabPanel header="Users">
+      <div class="flex flex-row gap-5">
+        <p-table
+          [value]="users"
+          [scrollable]="true"
+          scrollHeight="60vh"
+          selectionMode="single"
+          [(selection)]="selectedUser"
+          (onRowSelect)="onUserSelect($event)"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Id</th>
+              <th>Email</th>
+              <th>First name</th>
+              <th>Last name</th>
+              <th>Role</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-user>
+            <tr [pSelectableRow]="user">
+              <td>{{ user.id }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
+              <td>{{ user.role }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <div *ngIf="selectedUser !== null" class="flex flex-row gap-3">
+          <hr
+            style="
+              border-left: 2px solid rgb(222, 226, 230);
+              border-top: 2px solid rgb(222, 226, 230);
+            "
+          />
+          <div class="flex flex-column gap-3">
+            <div class="flex flex-column">
+              <label>Email</label>
+              <input pInputText [(ngModel)]="selectedUser.email" />
+            </div>
+            <div class="flex flex-column">
+              <label>First name</label>
+              <input pInputText [(ngModel)]="selectedUser.firstName" />
+            </div>
+            <div class="flex flex-column">
+              <label>Last name</label>
+              <input pInputText [(ngModel)]="selectedUser.lastName" />
+            </div>
+            <div class="flex flex-column">
+              <label>Role</label>
+              <p-selectButton
+                [options]="userRoleOptions"
+                [(ngModel)]="selectedUser.role"
+              ></p-selectButton>
+            </div>
+            <div class="flex flex-column gap-2 max-w-full">
+              <div class="flex flex-row justify-content-center gap-2">
+                <button
+                  pButton
+                  class="p-button-primary flex justify-content-center w-full"
+                  (click)="onChange()"
+                >
+                  Change
+                </button>
+                <button
+                  pButton
+                  class="p-button-danger flex justify-content-center w-full"
+                  (click)="onDelete()"
+                >
+                  Delete
+                </button>
+              </div>
+              <button
+                pButton
+                class="p-button-primary p-button-outlined flex justify-content-center"
+                (click)="onCancel()"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Projects">
+      <div class="flex flex-row gap-5">
+        <p-table
+          [value]="projects"
+          [scrollable]="true"
+          scrollHeight="45vh"
+          selectionMode="single"
+          (onRowSelect)="onProjectSelect($event)"
+          dataKey="id"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Id</th>
+              <th>Name</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-project>
+            <tr [pSelectableRow]="project">
+              <td>{{ project.id }}</td>
+              <td>{{ project.name }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+        <div *ngIf="selectedProject !== null" class="flex flex-row gap-3">
+          <hr
+            style="
+              border-left: 2px solid rgb(222, 226, 230);
+              border-top: 2px solid rgb(222, 226, 230);
+            "
+          />
+          <div class="flex flex-column gap-3">
+            <div class="flex flex-column gap-3">
+              <div class="flex flex-column">
+                <label>Project name</label>
+                <input pInputText [(ngModel)]="selectedProject.name" />
+              </div>
+              <div class="flex flex-column">
+                <label>Project members</label>
+                <p-table
+                  [value]="selectedProject.members"
+                  [scrollable]="true"
+                  scrollHeight="30vh"
+                  selectionMode="single"
+                  (onRowSelect)="onMemberSelection($event)"
+                  dataKey="id"
+                >
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th>Email</th>
+                      <th>Role</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-member>
+                    <tr [pSelectableRow]="member">
+                      <td>{{ member.memberEmail }}</td>
+                      <td>{{ member.memberRole }}</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </div>
+            <div class="flex flex-column gap-2 max-w-full">
+              <div class="flex flex-row justify-content-center gap-2">
+                <button
+                  pButton
+                  class="p-button-primary flex justify-content-center w-full"
+                  (click)="onProjectChange()"
+                >
+                  Change
+                </button>
+                <button
+                  pButton
+                  class="p-button-danger flex justify-content-center w-full"
+                  (click)="onProjectDelete()"
+                >
+                  Delete
+                </button>
+              </div>
+              <button
+                pButton
+                class="p-button-primary p-button-outlined flex justify-content-center"
+                (click)="onProjectCancel()"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>
+<p-dialog
+  header="Admin settings"
+  [(visible)]="memberDialogVisible"
+  [style]="{ 'max-width': '30vw', height: 'auto' }"
+>
+  <div
+    *ngIf="selectedProjectMember !== null"
+    class="flex flex-column gap-3 max-w-full"
+  >
+    <div class="flex flex-column">
+      <label>Email</label>
+      <p-chip
+        label="{{ selectedProjectMember.memberEmail }}"
+        styleClass="max-w-full"
+      ></p-chip>
+    </div>
+    <div class="flex flex-column">
+      <label>Member role</label>
+      <p-selectButton
+        [options]="memberRoleOptions"
+        [multiple]="false"
+        [(ngModel)]="selectedProjectMember.memberRole"
+      ></p-selectButton>
+    </div>
+    <button
+      pButton
+      class="flex justify-content-center"
+      (click)="onMemberRoleChangeConfirm()"
+    >
+      Ok
+    </button>
+  </div>
+</p-dialog>
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

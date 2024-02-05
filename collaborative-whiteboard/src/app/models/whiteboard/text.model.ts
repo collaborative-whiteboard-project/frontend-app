@@ -7,15 +7,24 @@ import {
 } from 'src/app/shared/create-shape-anchors-data.interface';
 import { SvgElementProperties } from 'src/app/shared/svg-element-properties.interface';
 import { Shape } from 'src/app/enums/shape.enum';
+import { SocketService } from 'src/app/services/socket/socket.service';
 
 export class Text extends SvgObject {
   override setAnchors(anchors: HTMLElement[]): void {}
   constructor(
     svgElement: HTMLElement,
     propertiesService: PropertiesService,
-    createShapeAnchorsEventEmitter: Subject<CreateShapeAnchorsData>
+    createShapeAnchorsEventEmitter: Subject<CreateShapeAnchorsData>,
+    endShapeDragEventEmitter: Subject<{ id: string; transform: string }>,
+    socketService: SocketService
   ) {
-    super(svgElement, propertiesService, createShapeAnchorsEventEmitter);
+    super(
+      svgElement,
+      propertiesService,
+      createShapeAnchorsEventEmitter,
+      endShapeDragEventEmitter,
+      socketService
+    );
     svgElement.setAttributeNS(null, 'cursor', 'default');
     svgElement.setAttributeNS(null, 'padding', '10px');
   }
@@ -34,6 +43,7 @@ export class Text extends SvgObject {
     const y = this.svgElement.getAttribute('y')!;
     const text = this.svgElement.innerHTML;
     const fontSize = this.svgElement.getAttribute('font-size')!;
+    const transform = this.svgElement.getAttribute('transform')!;
 
     return {
       id,
@@ -42,19 +52,22 @@ export class Text extends SvgObject {
       y: `${+y + this.translateY}`,
       text,
       'font-size': fontSize,
+      transform,
     };
   }
 
   override updateProperties(properties: SvgElementProperties): void {
-    const x = +this.svgElement.getAttribute('x')!;
-    const y = +this.svgElement.getAttribute('y')!;
-    this.translateX = +properties.x! - x;
-    this.translateY = +properties.y! - y;
-    this.svgElement.setAttribute(
-      'transform',
-      `translate(${this.translateX}, ${this.translateY})`
-    );
-    this.svgElement.innerHTML = properties.text!;
-    this.svgElement.setAttribute('font-size', properties['font-size']!);
+    if (this.canUserEdit) {
+      const x = +this.svgElement.getAttribute('x')!;
+      const y = +this.svgElement.getAttribute('y')!;
+      this.translateX = +properties.x! - x;
+      this.translateY = +properties.y! - y;
+      this.svgElement.setAttribute(
+        'transform',
+        `translate(${this.translateX}, ${this.translateY})`
+      );
+      this.svgElement.innerHTML = properties.text!;
+      this.svgElement.setAttribute('font-size', properties['font-size']!);
+    }
   }
 }

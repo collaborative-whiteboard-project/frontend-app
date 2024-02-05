@@ -1,3 +1,21 @@
+<div class="flex flex-row pl-2 pt-1 gap-1">
+  <button class="" pButton (click)="onExitProject()">
+    <i class="pi pi-chevron-left pr-1"></i>Leave
+  </button>
+  <p-menu #menu [model]="members" [popup]="true"></p-menu>
+  <button
+    pButton
+    type="button"
+    (click)="menu.toggle($event)"
+    icon="pi pi-bars"
+    label="Members"
+    class="p-button-outlined"
+  ></button>
+  <div class="flex align-items-center justify-content-center w-9">
+    <h2 class="m-0 flex align-items-center">{{ projectName }}</h2>
+  </div>
+  <div class="w-2 pr-2"></div>
+</div>
 <div class="container">
   <div class="toolbox-container"><app-toolbox></app-toolbox></div>
   <div class="whiteboard-container">

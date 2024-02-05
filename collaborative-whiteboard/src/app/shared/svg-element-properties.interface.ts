@@ -14,4 +14,5 @@ export interface SvgElementProperties {
   'fill-opacity'?: string;
   text?: string;
   'font-size'?: string;
+  transform: string;
 }
