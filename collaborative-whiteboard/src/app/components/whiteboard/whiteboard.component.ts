@@ -25,6 +25,14 @@ import {
 } from 'src/app/shared/create-shape-anchors-data.interface';
 import { NGXLogger } from 'ngx-logger';
 import { Line } from 'src/app/models/whiteboard/line.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SocketService } from 'src/app/services/socket/socket.service';
+import { CreateElementOperation } from 'src/app/dtos/create-element-operation';
+import { UpdateElmentOperation } from 'src/app/dtos/update-element-operation.dto';
+import { DeleteElementOperation } from 'src/app/dtos/delete-element-operation.dto';
+import { Project } from 'src/app/models/project/project';
+import { ProjectService } from 'src/app/services/projects/projects.service';
+import { AuthSerivce } from 'src/app/services/auth/auth.service';
 
 @Component({
   selector: 'app-whiteboard',
@@ -32,6 +40,8 @@ import { Line } from 'src/app/models/whiteboard/line.model';
   styleUrls: ['./whiteboard.component.scss'],
 })
 export class WhiteboardComponent implements OnInit, OnDestroy {
+  projectId: string = '';
+
   svgWidth = '1201';
   svgHeight = '801';
   svgObjectsGroup: HTMLElement | null = null;
@@ -44,7 +54,10 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
   selectedElementId: string | null = null;
   drawingModeActiveted: boolean = false;
 
+  canUserEdit = false;
+
   createShapeAnchorsEventEmmiter = new Subject<CreateShapeAnchorsData>();
+  endShapeDragEventEmitter = new Subject<{ id: string; transform: string }>();
 
   createShapeSub = new Subscription();
   activateDrawingModeSub = new Subscription();
@@ -57,16 +70,24 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
     @Inject(DOCUMENT) private document: Document,
     private shapeCreationService: ShapeCreationService,
     private toolboxService: ToolboxService,
-    private propertiesService: PropertiesService
+    private propertiesService: PropertiesService,
+    private activatedRoute: ActivatedRoute,
+    private socketService: SocketService,
+    private router: Router,
+    private projectService: ProjectService,
+    private authService: AuthSerivce
   ) {
     this.createShapeSub = this.toolboxService.createShapeEventEmitter.subscribe(
       (shapeType: Shape) => {
-        this.createNewFigure(shapeType);
+        if (this.canUserEdit) {
+          this.createNewFigure(shapeType);
+        }
       }
     );
   }
 
   ngOnInit(): void {
+    this.projectId = String(this.activatedRoute.snapshot.params['id']);
     const svg = <HTMLElement>this.document.getElementById('svg');
     svg.setAttribute('width', this.svgWidth);
     svg.setAttribute('height', this.svgHeight);
@@ -143,6 +164,196 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
         }
       }
     );
+
+    this.endShapeDragEventEmitter.subscribe((value) => {
+      this.socketService.updateWhiteboardElement(
+        value.id,
+        'transform',
+        value.transform
+      );
+    });
+
+    this.socketService.listenToProjectContentEvent().subscribe({
+      next: (value) => {
+        value.elements.forEach((element) => {
+          const htmlElement =
+            this.shapeCreationService.createShapeFromExternalData(
+              element,
+              this.document
+            );
+
+          if (!!htmlElement) {
+            if (element['element-type'] !== 'TEXT') {
+              this.svgObjectsShapesGroup?.appendChild(htmlElement);
+            } else {
+              this.svgObjectsTextGroup?.appendChild(htmlElement);
+            }
+          }
+
+          if (element['element-type'] === 'LINE' && !!this.svgHelpersGroup) {
+            const wrapperLine = this.shapeCreationService.createWrapperLine(
+              this.document
+            );
+            this.svgHelpersGroup.appendChild(wrapperLine![0]);
+            this.createLineModel(htmlElement!, wrapperLine![0]);
+          } else {
+            this.createShapeModel(
+              element['element-type'] as Shape,
+              htmlElement!
+            );
+          }
+        });
+        this.establishUserEditPermission();
+      },
+    });
+
+    this.socketService.listenToLatestChangesEvent().subscribe({
+      next: (operations) => {
+        operations.forEach((operation) => {
+          if (!!(operation as CreateElementOperation).element) {
+            const op = operation as CreateElementOperation;
+            const htmlElement =
+              this.shapeCreationService.createShapeFromExternalData(
+                op.element,
+                this.document
+              );
+
+            if (!!htmlElement) {
+              if (op.element['element-type'] !== 'TEXT') {
+                this.svgObjectsShapesGroup?.appendChild(htmlElement);
+              } else {
+                this.svgObjectsTextGroup?.appendChild(htmlElement);
+              }
+
+              if (
+                op.element['element-type'] === Shape.LINE &&
+                !!this.svgHelpersGroup
+              ) {
+                const wrapperLine = this.shapeCreationService.createWrapperLine(
+                  this.document
+                );
+                this.svgHelpersGroup.appendChild(wrapperLine![0]);
+                this.createLineModel(htmlElement!, wrapperLine![0]);
+              } else {
+                this.createShapeModel(
+                  op.element['element-type'] as Shape,
+                  htmlElement!
+                );
+              }
+            }
+          } else if (!!(operation as UpdateElmentOperation)['property-name']) {
+            const op = operation as UpdateElmentOperation;
+            const object = this.objects[op.id];
+            object.updateProperty(op['property-name'], op['property-value']);
+          } else if (!!(operation as DeleteElementOperation).id) {
+            console.log('dfghjklkjhgfdfghjkjhgfdghjk');
+            const op = operation as DeleteElementOperation;
+            const selectedElementModel = this.objects[op.id];
+            this.removeShapeAnchors(op.id);
+            const elementToDelete = <HTMLElement>(
+              this.document.getElementById(op.id)
+            );
+            if (selectedElementModel instanceof Line && !!elementToDelete) {
+              const wrapperElement = selectedElementModel.getWrapperElement();
+              this.svgHelpersGroup?.removeChild(wrapperElement);
+            }
+            if (selectedElementModel instanceof Text && !!elementToDelete) {
+              this.svgObjectsTextGroup?.removeChild(elementToDelete);
+            } else if (!!elementToDelete) {
+              console.log(JSON.stringify(op.id));
+              this.svgObjectsShapesGroup?.removeChild(elementToDelete);
+            }
+            this.selectedElementId = null;
+            this.propertiesService.clearSelectedEventEmmiter.next();
+          }
+          this.updateEditPermission();
+        });
+      },
+      error: () => {
+        this.router.navigate(['']);
+      },
+    });
+
+    this.socketService.listenToCreateElement().subscribe({
+      next: (operation) => {
+        const el = this.document.getElementById(operation.element.id);
+        if (!!el) {
+          return;
+        }
+        const htmlElement =
+          this.shapeCreationService.createShapeFromExternalData(
+            operation.element,
+            this.document
+          );
+
+        if (!!htmlElement) {
+          if (operation.element['element-type'] !== 'TEXT') {
+            this.svgObjectsShapesGroup?.appendChild(htmlElement);
+          } else {
+            this.svgObjectsTextGroup?.appendChild(htmlElement);
+          }
+          if (
+            operation.element['element-type'] === Shape.LINE &&
+            !!this.svgHelpersGroup
+          ) {
+            const wrapperLine = this.shapeCreationService.createWrapperLine(
+              this.document
+            );
+            this.svgHelpersGroup.appendChild(wrapperLine![0]);
+            this.createLineModel(htmlElement!, wrapperLine![0]);
+          } else {
+            this.createShapeModel(
+              operation.element['element-type'] as Shape,
+              htmlElement!
+            );
+          }
+        }
+        this.updateEditPermission();
+      },
+    });
+
+    this.socketService.listenToUpdateElement().subscribe({
+      next: (operation) => {
+        const object = this.objects[operation.id];
+        object.updateProperty(
+          operation['property-name'],
+          operation['property-value']
+        );
+        this.updateEditPermission();
+      },
+    });
+
+    this.socketService.listenToDeleteElement().subscribe({
+      next: (operation) => {
+        const object = this.objects[operation.id];
+        object.deleteElement();
+        this.updateEditPermission();
+      },
+    });
+  }
+
+  private establishUserEditPermission() {
+    this.projectService
+      .getProjectMembers(this.projectId)
+      .subscribe((members) => {
+        const user = this.authService.getLogged();
+        if (!!user) {
+          const memberList = members.filter((projectMember) => {
+            return projectMember.email === user.email;
+          });
+          if (memberList.length > 0) {
+            if (memberList[0].memberRole === 'VIEWER') {
+              this.canUserEdit = false;
+            } else {
+              this.canUserEdit = true;
+            }
+            this.updateEditPermission();
+            return;
+          }
+          return;
+        }
+        this.router.navigate(['/dashboard']);
+      });
   }
 
   @HostListener('window:keyup', ['$event'])
@@ -176,6 +387,10 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
         } else {
           this.svgObjectsShapesGroup?.removeChild(elementToDelete);
         }
+        this.socketService.deleteWhiteboardElement(
+          this.projectId,
+          this.selectedElementId
+        );
         this.selectedElementId = null;
         this.propertiesService.clearSelectedEventEmmiter.next();
       }
@@ -203,21 +418,23 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       this.document,
       d
     );
+
     if (!!newShape && !!this.svgObjectsShapesGroup) {
       if (shapeType !== Shape.TEXT) {
-        this.svgObjectsShapesGroup.appendChild(newShape);
+        this.svgObjectsShapesGroup.appendChild(newShape[0]);
       } else {
-        this.svgObjectsTextGroup?.appendChild(newShape);
+        this.svgObjectsTextGroup?.appendChild(newShape[0]);
       }
       if (shapeType === Shape.LINE && !!this.svgHelpersGroup) {
         const wrapperLine = this.shapeCreationService.createWrapperLine(
           this.document
         );
-        this.svgHelpersGroup.appendChild(wrapperLine!);
-        this.createLineModel(newShape, wrapperLine!);
+        this.svgHelpersGroup.appendChild(wrapperLine![0]);
+        this.createLineModel(newShape[0], wrapperLine![0]);
       } else {
-        this.createShapeModel(shapeType, newShape);
+        this.createShapeModel(shapeType, newShape[0]);
       }
+      this.socketService.createWhiteboardElement(this.projectId, newShape[1]!);
     }
   }
 
@@ -234,28 +451,36 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
         this.objects[id] = new Rectangle(
           element,
           this.propertiesService,
-          this.createShapeAnchorsEventEmmiter
+          this.createShapeAnchorsEventEmmiter,
+          this.endShapeDragEventEmitter,
+          this.socketService
         );
         break;
       case Shape.CIRCLE:
         this.objects[id] = new Circle(
           element,
           this.propertiesService,
-          this.createShapeAnchorsEventEmmiter
+          this.createShapeAnchorsEventEmmiter,
+          this.endShapeDragEventEmitter,
+          this.socketService
         );
         break;
       case Shape.PATH:
         this.objects[id] = new Path(
           element,
           this.propertiesService,
-          this.createShapeAnchorsEventEmmiter
+          this.createShapeAnchorsEventEmmiter,
+          this.endShapeDragEventEmitter,
+          this.socketService
         );
         break;
       case Shape.TEXT:
         this.objects[id] = new Text(
           element,
           this.propertiesService,
-          this.createShapeAnchorsEventEmmiter
+          this.createShapeAnchorsEventEmmiter,
+          this.endShapeDragEventEmitter,
+          this.socketService
         );
         break;
       default:
@@ -272,7 +497,9 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       svgLine,
       svgLineWrapper,
       this.createShapeAnchorsEventEmmiter,
-      this.propertiesService
+      this.propertiesService,
+      this.endShapeDragEventEmitter,
+      this.socketService
     );
   }
 
@@ -281,5 +508,12 @@ export class WhiteboardComponent implements OnInit, OnDestroy {
       anchorsCoordinates,
       this.document
     );
+  }
+
+  private updateEditPermission() {
+    for (let object in this.objects) {
+      this.objects[object].canUserEdit = this.canUserEdit;
+    }
+    this.propertiesService.canUserEdit = this.canUserEdit;
   }
 }

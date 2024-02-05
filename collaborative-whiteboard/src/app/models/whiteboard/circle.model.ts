@@ -8,6 +8,7 @@ import {
 import { parseTransformAttribute } from 'src/app/helpers/parse-transform-attribute.helper';
 import { SvgElementProperties } from 'src/app/shared/svg-element-properties.interface';
 import { Shape } from 'src/app/enums/shape.enum';
+import { SocketService } from 'src/app/services/socket/socket.service';
 
 enum ResizeType {
   REDUCE_RADIUS = 'reduce_radius',
@@ -18,9 +19,17 @@ export class Circle extends SvgObject {
   constructor(
     svgElement: HTMLElement,
     propertiesService: PropertiesService,
-    createShapeAnchorsEventEmitter: Subject<CreateShapeAnchorsData>
+    createShapeAnchorsEventEmitter: Subject<CreateShapeAnchorsData>,
+    endShapeDragEventEmitter: Subject<{ id: string; transform: string }>,
+    socketService: SocketService
   ) {
-    super(svgElement, propertiesService, createShapeAnchorsEventEmitter);
+    super(
+      svgElement,
+      propertiesService,
+      createShapeAnchorsEventEmitter,
+      endShapeDragEventEmitter,
+      socketService
+    );
   }
 
   override getAnchorsCoordinates(): AnchorCoordinates[] {
@@ -56,6 +65,7 @@ export class Circle extends SvgObject {
     const strokeWidth = this.svgElement.getAttribute('stroke-width')!;
     const fill = this.svgElement.getAttribute('fill')!;
     const fillOpacity = this.svgElement.getAttribute('fill-opacity')!;
+    const transform = this.svgElement.getAttribute('transform')!;
 
     return {
       id,
@@ -67,6 +77,7 @@ export class Circle extends SvgObject {
       'stroke-width': strokeWidth,
       fill,
       'fill-opacity': fillOpacity,
+      transform,
     };
   }
 
@@ -122,7 +133,7 @@ export class Circle extends SvgObject {
 
   onMouseMoveTopAnchor(event: Event) {
     const mouseEvent = <MouseEvent>event;
-    if (this.anchorMouseDown) {
+    if (this.anchorMouseDown && this.canUserEdit) {
       const dy = mouseEvent.clientY - this.anchorDragY;
       this.anchorDragX = mouseEvent.clientX;
       this.anchorDragY = mouseEvent.clientY;
@@ -137,7 +148,7 @@ export class Circle extends SvgObject {
 
   onMouseMoveBottomAnchor(event: Event) {
     const mouseEvent = <MouseEvent>event;
-    if (this.anchorMouseDown) {
+    if (this.anchorMouseDown && this.canUserEdit) {
       const dy = mouseEvent.clientY - this.anchorDragY;
       this.anchorDragX = mouseEvent.clientX;
       this.anchorDragY = mouseEvent.clientY;
@@ -152,7 +163,7 @@ export class Circle extends SvgObject {
 
   onMouseMoveLeftAnchor(event: Event) {
     const mouseEvent = <MouseEvent>event;
-    if (this.anchorMouseDown) {
+    if (this.anchorMouseDown && this.canUserEdit) {
       const dx = mouseEvent.clientX - this.anchorDragX;
       this.anchorDragX = mouseEvent.clientX;
       this.anchorDragY = mouseEvent.clientY;
@@ -167,7 +178,7 @@ export class Circle extends SvgObject {
 
   onMouseMoveRightAnchor(event: Event) {
     const mouseEvent = <MouseEvent>event;
-    if (this.anchorMouseDown) {
+    if (this.anchorMouseDown && this.canUserEdit) {
       const dx = mouseEvent.clientX - this.anchorDragX;
       this.anchorDragX = mouseEvent.clientX;
       this.anchorDragY = mouseEvent.clientY;
@@ -181,23 +192,25 @@ export class Circle extends SvgObject {
   }
 
   override updateProperties(properties: SvgElementProperties): void {
-    const x = +this.svgElement.getAttribute('cx')!;
-    const y = +this.svgElement.getAttribute('cy')!;
-    this.translateX = +properties.x! - x;
-    this.translateY = +properties.y! - y;
-    this.svgElement.setAttribute(
-      'transform',
-      `translate(${this.translateX}, ${this.translateY})`
-    );
-    this.svgElement.setAttribute('r', properties.r!);
-    this.svgElement.setAttribute('stroke', properties.stroke!);
-    this.svgElement.setAttribute('stroke-width', properties['stroke-width']!);
-    this.svgElement.setAttribute('fill', properties.fill!);
-    this.svgElement.setAttribute('fill-opacity', properties['fill-opacity']!);
-    this.createShapeAnchorsEventEmitter.next({
-      shapeId: properties.id,
-      anchorsCoordinates: this.getAnchorsCoordinates(),
-    });
+    if (this.canUserEdit) {
+      const x = +this.svgElement.getAttribute('cx')!;
+      const y = +this.svgElement.getAttribute('cy')!;
+      this.translateX = +properties.x! - x;
+      this.translateY = +properties.y! - y;
+      this.svgElement.setAttribute(
+        'transform',
+        `translate(${this.translateX}, ${this.translateY})`
+      );
+      this.svgElement.setAttribute('r', properties.r!);
+      this.svgElement.setAttribute('stroke', properties.stroke!);
+      this.svgElement.setAttribute('stroke-width', properties['stroke-width']!);
+      this.svgElement.setAttribute('fill', properties.fill!);
+      this.svgElement.setAttribute('fill-opacity', properties['fill-opacity']!);
+      this.createShapeAnchorsEventEmitter.next({
+        shapeId: properties.id,
+        anchorsCoordinates: this.getAnchorsCoordinates(),
+      });
+    }
   }
 
   private resizeCircle(amount: number, resizeType: ResizeType) {

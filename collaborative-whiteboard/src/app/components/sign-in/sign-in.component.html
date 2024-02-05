@@ -21,7 +21,7 @@
     <small *ngIf="passwordEmpty" class="empty-info"
       >Password cannot be empty.</small
     ><br />
-    <small>Reset password</small>
+    <small (click)="onForgotPassword()">Forgot password?</small>
   </div>
   <div class="form-input">
     <p-button (onClick)="onSignIn()">Sign in</p-button>

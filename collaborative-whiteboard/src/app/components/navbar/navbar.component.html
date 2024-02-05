@@ -3,5 +3,38 @@
     <ng-template pTemplate="start">
       <p>Collaborative Whiteboard</p>
     </ng-template>
+    <ng-template pTemplate="end">
+      <!-- <i
+        class="pi pi-user user-icon"
+        style="font-size: 1.2rem"
+        (click)="showUserDialog()"
+      ></i> -->
+      <p-menu #menu [model]="userMenuItems" [popup]="true"></p-menu>
+      <div
+        (click)="menu.toggle($event)"
+        class="flex justify-content-center align-items-center"
+        *ngIf="userLoggedIn"
+      >
+        <i
+          class="pi pi-angle-down"
+          [style]="{
+            cursor: 'pointer'
+          }"
+        ></i>
+        <p-avatar
+          shape="circle"
+          size="normal"
+          [style]="{
+            cursor: 'pointer',
+            'background-color': '#2196F3',
+            color: 'white',
+            'margin-left': '0.5rem'
+          }"
+          >{{ userFirstName.at(0) }}</p-avatar
+        >
+      </div>
+    </ng-template>
   </p-menubar>
 </div>
+<app-user-panel [(userPanelVisible)]="userSettingsVisible"></app-user-panel>
+<app-admin-panel [(adminPanelVisible)]="adminPanelVisible"></app-admin-panel>

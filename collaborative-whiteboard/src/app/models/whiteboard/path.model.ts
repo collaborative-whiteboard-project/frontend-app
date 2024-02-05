@@ -7,14 +7,23 @@ import {
 } from 'src/app/shared/create-shape-anchors-data.interface';
 import { SvgElementProperties } from 'src/app/shared/svg-element-properties.interface';
 import { Shape } from 'src/app/enums/shape.enum';
+import { SocketService } from 'src/app/services/socket/socket.service';
 
 export class Path extends SvgObject {
   constructor(
     svgElement: HTMLElement,
     propertiesService: PropertiesService,
-    createShapeAnchorsEventEmitter: Subject<CreateShapeAnchorsData>
+    createShapeAnchorsEventEmitter: Subject<CreateShapeAnchorsData>,
+    endShapeDragEventEmitter: Subject<{ id: string; transform: string }>,
+    socketService: SocketService
   ) {
-    super(svgElement, propertiesService, createShapeAnchorsEventEmitter);
+    super(
+      svgElement,
+      propertiesService,
+      createShapeAnchorsEventEmitter,
+      endShapeDragEventEmitter,
+      socketService
+    );
   }
 
   override setAnchors(anchors: HTMLElement[]): void {
@@ -34,6 +43,7 @@ export class Path extends SvgObject {
     const strokeWidth = this.svgElement.getAttribute('stroke-width')!;
     const fill = this.svgElement.getAttribute('fill')!;
     const fillOpacity = this.svgElement.getAttribute('fill-opacity')!;
+    const transform = this.svgElement.getAttribute('transform')!;
 
     return {
       id,
@@ -42,13 +52,16 @@ export class Path extends SvgObject {
       'stroke-width': strokeWidth,
       fill,
       'fill-opacity': fillOpacity,
+      transform,
     };
   }
 
   override updateProperties(properties: SvgElementProperties): void {
-    this.svgElement.setAttribute('stroke', properties.stroke!);
-    this.svgElement.setAttribute('stroke-width', properties['stroke-width']!);
-    this.svgElement.setAttribute('fill', properties.fill!);
-    this.svgElement.setAttribute('fill-opacity', properties['fill-opacity']!);
+    if (this.canUserEdit) {
+      this.svgElement.setAttribute('stroke', properties.stroke!);
+      this.svgElement.setAttribute('stroke-width', properties['stroke-width']!);
+      this.svgElement.setAttribute('fill', properties.fill!);
+      this.svgElement.setAttribute('fill-opacity', properties['fill-opacity']!);
+    }
   }
 }

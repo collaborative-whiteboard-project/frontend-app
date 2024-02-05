@@ -1,0 +1,88 @@
+<p-dialog
+  header="User settings"
+  [(visible)]="userPanelVisible"
+  (onHide)="closeUserPanel()"
+  [style]="{ 'max-width': '40vw' }"
+  (onShow)="onShow()"
+  ><p-tabView>
+    <p-tabPanel header="User details">
+      <div class="info-container">
+        <div class="flex flex-row gap-1 justify-content-start flex-wrap">
+          <label class="flex align-items-center">Email:</label>
+          <p-chip label="{{ user.email }}"></p-chip>
+        </div>
+        <div class="flex flex-column gap-1 max-w-full">
+          <label>First name</label>
+          <input
+            pInputText
+            [(ngModel)]="userCopy.firstName"
+            (ngModelChange)="onNameChange()"
+          />
+        </div>
+        <div class="flex flex-column gap-1 max-w-full">
+          <label>Last name</label>
+          <input
+            pInputText
+            [(ngModel)]="userCopy.lastName"
+            (ngModelChange)="onNameChange()"
+          />
+        </div>
+        <div class="flex justify-content-center gap-4 mt-3 flex-wrap">
+          <p-button
+            severity="primary"
+            [outlined]="true"
+            [raised]="true"
+            (onClick)="closeUserPanel()"
+            >Cancel</p-button
+          >
+          <p-button
+            [raised]="true"
+            [disabled]="!userDataChanged"
+            (onClick)="onNameChangeButton()"
+            >Change</p-button
+          >
+        </div>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Change password">
+      <div class="change-password-container">
+        <div class="flex flex-column gap-1">
+          <label>New password</label>
+          <p-password
+            inputStyleClass="max-w-full"
+            styleClass="max-w-full"
+            [(ngModel)]="password"
+            (ngModelChange)="onPasswordChange()"
+            [feedback]="false"
+          ></p-password>
+        </div>
+        <div class="flex flex-column gap-1">
+          <label>Password confirmation</label>
+          <p-password
+            inputStyleClass="max-w-full"
+            styleClass="max-w-full"
+            [(ngModel)]="passwordConfirmation"
+            (ngModelChange)="onPasswordChange()"
+            [feedback]="false"
+          ></p-password>
+        </div>
+        <small *ngIf="!passwordsIdentical">Passwords not identical.</small>
+      </div>
+      <div class="flex justify-content-center gap-4 mt-3 flex-wrap">
+        <p-button
+          severity="primary"
+          [outlined]="true"
+          [raised]="true"
+          (onClick)="closeUserPanel()"
+          >Cancel</p-button
+        >
+        <p-button
+          [raised]="true"
+          (onClick)="onPasswordChangeButton()"
+          [disabled]="passwordsEmpty"
+          >Change</p-button
+        >
+      </div>
+    </p-tabPanel>
+  </p-tabView>
+</p-dialog>

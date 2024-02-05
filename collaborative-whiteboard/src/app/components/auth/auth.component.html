@@ -1,12 +1,16 @@
 <div class="login-screen">
-  <p-card styleClass="shadow-4">
-    <p-tabView>
+  <p-card styleClass="shadow-4" header="{{ cardHeader }}">
+    <p-tabView *ngIf="!forgotPasswordEnabled">
       <p-tabPanel header="Sign in">
-        <app-sign-in></app-sign-in>
+        <app-sign-in (forgotPassword)="onForgotPassword()"></app-sign-in>
       </p-tabPanel>
       <p-tabPanel header="Sign up">
         <app-sign-up></app-sign-up>
       </p-tabPanel>
     </p-tabView>
+    <app-forgot-password
+      *ngIf="forgotPasswordEnabled"
+      (goBackToSignIn)="onGoBackToSignIn()"
+    ></app-forgot-password>
   </p-card>
 </div>
